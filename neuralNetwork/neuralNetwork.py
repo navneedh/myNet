@@ -12,22 +12,25 @@ class NeuralNetwork:
         self.computation = None
         self.weightArray = []
 
-    def forwardProp(self):
-        initialData = 1
-
-    def train(self,data):
-        self.layerArray[0] = data[0]
+    def train(self,data,error="logistic"): #probably need to create another train function for multiclass
+        self.layerArray[0].neurons = data[0]
         self.forwardProp(data[0])
+        if error == "logistic":
+
+
         #for sample in data:
             #forwardProp()
             #backwardProp()
 
     def forwardProp(self, inputData):
+        print(self.layerArray)
         oneVal = inputData
-        for layer in self.layerArray[1:]:
-            oneVal = np.dot(layer,oneVal)
-            layer.neurons = oneVal
-            print(layer.neurons)
+        for i in range(len(self.layerArray) - 1):
+            oneVal = np.dot(self.layerArray[i].weights,oneVal)
+            self.layerArray[i+1].neurons = oneVal
+            print(self.layerArray[i+1].neurons)
+
+        return oneVal
 
 
     def toString(self):
