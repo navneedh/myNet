@@ -1,5 +1,6 @@
 import numpy as np
 import layer as ly
+import math
 
 class NeuralNetwork:
     def __init__(self, layerSize, inputData):
@@ -9,27 +10,29 @@ class NeuralNetwork:
         self.input = inputData
         self.inputFeatureSize = inputData.shape[1]
         self.trials = 0
-        self.computation = None
+        self.computation = Computation(self)
         self.weightArray = []
 
     def train(self,data,error="logistic"): #probably need to create another train function for multiclass
         self.layerArray[0].neurons = data[0]
-        self.forwardProp(data[0])
+        self.forwardProp(data[0], layerArray[0].actFunc)
         if error == "logistic":
-
+            print("test")
 
         #for sample in data:
             #forwardProp()
             #backwardProp()
 
-    def forwardProp(self, inputData):
-        print(self.layerArray)
+    def forwardProp(self, inputData, activation):
         oneVal = inputData
-        for i in range(len(self.layerArray) - 1):
+        for i in range(len(self.layerArray) - 1): #default sigmoid activation
             oneVal = np.dot(self.layerArray[i].weights,oneVal)
+            vfunc = np.vectorize(actDict[])
+            oneVal = vfunc(oneVal)
+            #oneVal = np.apply_along_axis(self.computation.relu, 0, [oneVal])[0]
             self.layerArray[i+1].neurons = oneVal
-            print(self.layerArray[i+1].neurons)
-
+            print(oneVal)
+            print("**********")
         return oneVal
 
 
@@ -76,3 +79,19 @@ class Computation:
         self.forPropValue = 0
         self.backPropValue = 0
         self.totalError = 0
+
+    def sigmoid(x):
+            return 1/ (1 + math.exp(-x))
+
+    def tanh(x):
+            #need to fill this in
+            return None
+
+    def linear(x):
+            return x
+
+    def relu(x):
+        if x < 0:
+            return 0
+        else:
+            return x
