@@ -1,8 +1,13 @@
 import numpy as np
 import layer as ly
-import math
+import computation as cp
+
+
+#constants
+actDict = {'sigmoid': cp.sigmoid, 'relu': cp.relu, 'tanh' : cp.tanh}
 
 class NeuralNetwork:
+
     def __init__(self, layerSize, inputData):
         self.numLayers = layerSize
         self.layerArray = []
@@ -10,12 +15,12 @@ class NeuralNetwork:
         self.input = inputData
         self.inputFeatureSize = inputData.shape[1]
         self.trials = 0
-        self.computation = Computation(self)
+        self.computation = cp.Computation(self)
         self.weightArray = []
 
     def train(self,data,error="logistic"): #probably need to create another train function for multiclass
         self.layerArray[0].neurons = data[0]
-        self.forwardProp(data[0], layerArray[0].actFunc)
+        self.forwardProp(data[0], self.layerArray[0].actFunc)
         if error == "logistic":
             print("test")
 
@@ -27,7 +32,7 @@ class NeuralNetwork:
         oneVal = inputData
         for i in range(len(self.layerArray) - 1): #default sigmoid activation
             oneVal = np.dot(self.layerArray[i].weights,oneVal)
-            vfunc = np.vectorize(actDict[])
+            vfunc = np.vectorize(actDict[self.layerArray[i + 1].actFunc])
             oneVal = vfunc(oneVal)
             #oneVal = np.apply_along_axis(self.computation.relu, 0, [oneVal])[0]
             self.layerArray[i+1].neurons = oneVal
@@ -48,9 +53,9 @@ class NeuralNetwork:
         inputLayer = ly.Layer(network.inputFeatureSize, 'start', True)
 
         if classify == "binary":
-            lastLayer = ly.Layer(1, 'end', True)
+            lastLayer = ly.Layer(1, 'sigmoid', True)
         elif classify == "multiclass":
-            lastLayer = ly.Layer(10000, 'end', True) #100 is a filler number
+            lastLayer = ly.Layer(10000, 'softmax', True) #100 is a filler number
 
         prevSize, prevLayer = inputLayer.size, inputLayer
         args.insert(0,inputLayer)
@@ -71,27 +76,4 @@ class NeuralNetwork:
             except:
                 print("Wrong initializations")
 
-
-
-class Computation:
-
-    def __init__(self, network):
-        self.forPropValue = 0
-        self.backPropValue = 0
-        self.totalError = 0
-
-    def sigmoid(x):
-            return 1/ (1 + math.exp(-x))
-
-    def tanh(x):
-            #need to fill this in
-            return None
-
-    def linear(x):
-            return x
-
-    def relu(x):
-        if x < 0:
-            return 0
-        else:
-            return x
+    actDict = {'sigmoid': cp.sigmoid, 'relu': cp.relu}
