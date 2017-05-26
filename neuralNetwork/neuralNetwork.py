@@ -6,6 +6,8 @@ import computation as cp
 #constants
 actDict = {'sigmoid': cp.sigmoid, 'relu': cp.relu, 'tanh' : cp.tanh}
 
+lossDict = {'softmax':cp.softmax, 'logistic':cp.logistic}
+
 class NeuralNetwork:
 
     def __init__(self, layerSize, inputData):
@@ -18,17 +20,20 @@ class NeuralNetwork:
         self.computation = cp.Computation(self)
         self.weightArray = []
 
-    def train(self,data,error="logistic"): #probably need to create another train function for multiclass
-        self.layerArray[0].neurons = data[0]
-        self.forwardProp(data[0], self.layerArray[0].actFunc)
+    def train(self,X,Y,error="logistic"): #probably need to create another train function for multiclass
+        self.layerArray[0].neurons = X[0]
+        finalValue = self.forwardProp(X[0])[0]
         if error == "logistic":
-            print("test")
+            print(finalValue)
+            print(Y[0])
+            print(lossDict[error](1, finalValue))
+
 
         #for sample in data:
             #forwardProp()
             #backwardProp()
 
-    def forwardProp(self, inputData, activation):
+    def forwardProp(self, inputData):
         oneVal = inputData
         for i in range(len(self.layerArray) - 1): #default sigmoid activation
             oneVal = np.dot(self.layerArray[i].weights,oneVal)
