@@ -53,3 +53,6 @@ def l2(actual, expected):
 
 def derSigmoid(x):
     return math.exp(-x)/(math.pow((1 + math.exp(-x)),2))
+
+def derLogLoss(x):
+    return 
