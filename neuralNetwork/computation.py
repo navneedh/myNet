@@ -12,8 +12,7 @@ def sigmoid(x):
     return 1/ (1 + math.exp(-x))
 
 def tanh(x):
-    #need to fill this in
-    return None
+    return np.tanh([x]) #might only be possible with array
 
 def linear(x):
     return x
@@ -24,19 +23,20 @@ def relu(x):
     else:
         return x
 
-def softmax(x):
+def softmax(x): #only for multiclass and final layer
     pass
 
 #loss functions
+#actual is wrong and expected is right
 
 def logistic(actual, expected): #binary classification should be used with sigmoid
-    if actual == 1:
-        return -math.log(expected)
-    elif actual == 0:
-        return -math.log(1-expected)
+    if expected == 1:
+        return -math.log(actual) #this does natural log
+    elif expected == 0:
+        return -math.log(1-actual)
 
 def hinge(actual, expected): #does not need to use sigmoid function before hinge loss, directly take linear output into hinge loss function
-    return math.max(0,1-expected*actual)ß
+    return math.max(0,1-expected*actual)
 
 def crossEntropy(actual,expected): #multiclass classification should be used with softmax
     pass
@@ -48,3 +48,8 @@ def l2(actual, expected):
     return math.abs(actual-expected)
 
 #figure out what loss function to use for relu
+
+#derivatives
+
+def derSigmoid(x):
+    return math.exp(-x)/(math.pow((1 + math.exp(-x)),2))

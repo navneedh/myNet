@@ -20,14 +20,13 @@ class NeuralNetwork:
         self.computation = cp.Computation(self)
         self.weightArray = []
 
-    def train(self,X,Y,error="logistic"): #probably need to create another train function for multiclass
+    def train(self,X,Y,errorFunc="logistic"): #probably need to create another train function for multiclass
         self.layerArray[0].neurons = X[0]
         finalValue = self.forwardProp(X[0])[0]
-        if error == "logistic":
-            print(finalValue)
-            print(Y[0])
-            print(lossDict[error](1, finalValue))
-
+        #print(finalValue)
+        #print(Y[0])
+        errorVal = lossDict[errorFunc](finalValue, Y[0])
+        self.backwardProp(errorVal, errorFunc)
 
         #for sample in data:
             #forwardProp()
@@ -38,13 +37,20 @@ class NeuralNetwork:
         for i in range(len(self.layerArray) - 1): #default sigmoid activation
             oneVal = np.dot(self.layerArray[i].weights,oneVal)
             vfunc = np.vectorize(actDict[self.layerArray[i + 1].actFunc])
+
+            for x in range(self.layerArray[i].weights.shape[0]):
+                for y in range (self.layerArray[i].weights.shape[1])
+
             oneVal = vfunc(oneVal)
             #oneVal = np.apply_along_axis(self.computation.relu, 0, [oneVal])[0]
+
             self.layerArray[i+1].neurons = oneVal
             print(oneVal)
             print("**********")
         return oneVal
 
+    def backwardProp(self, error, loss_function):
+        pass
 
     def toString(self):
         for layer in self.layerArray:
@@ -74,11 +80,10 @@ class NeuralNetwork:
                 network.layerArray.append(layer)
                 prevLayer.next = layer;
                 prevLayer.weights = layer.createMatrix(layer.size, prevSize, initialize)
+                prevLayer.partialDer = layer.createMatrix(layer.size, prevSize, 'zeros')
                 #layer.aMatrix = prevLayer.weights
                 network.weightArray.append(prevLayer.weights)
                 network.layerSizes.append(layer.size)
                 prevSize, prevLayer = layer.size, layer
             except:
                 print("Wrong initializations")
-
-    actDict = {'sigmoid': cp.sigmoid, 'relu': cp.relu}
