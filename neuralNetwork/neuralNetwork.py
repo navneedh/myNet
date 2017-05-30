@@ -8,6 +8,8 @@ actDict = {'sigmoid': cp.sigmoid, 'relu': cp.relu, 'tanh' : cp.tanh}
 
 lossDict = {'softmax':cp.softmax, 'logistic':cp.logistic}
 
+derDict = {'derSig' : cp.derSigmoid}
+
 class NeuralNetwork:
 
     def __init__(self, layerSize, inputData):
@@ -37,16 +39,25 @@ class NeuralNetwork:
         for i in range(len(self.layerArray) - 1): #default sigmoid activation
             oneVal = np.dot(self.layerArray[i].weights,oneVal)
             vfunc = np.vectorize(actDict[self.layerArray[i + 1].actFunc])
+            print(self.layerArray[i].weights.shape)
+            print(self.layerArray[i].partialDer.shape)
+            print(self.layerArray[i].weights)
 
+            #partial derivative calculation 
             for x in range(self.layerArray[i].weights.shape[0]):
-                for y in range (self.layerArray[i].weights.shape[1])
+                for y in range (self.layerArray[i].weights.shape[1]):
+                    print(x, y)
+                    print(inputData)
+                    print(oneVal)
+                    self.layerArray[i].partialDer[x,y] = inputData[y] * derDict['derSig'](oneVal[x])
 
+            inputData = oneVal
             oneVal = vfunc(oneVal)
             #oneVal = np.apply_along_axis(self.computation.relu, 0, [oneVal])[0]
 
             self.layerArray[i+1].neurons = oneVal
-            print(oneVal)
-            print("**********")
+            # print(oneVal)
+            # print("**********")
         return oneVal
 
     def backwardProp(self, error, loss_function):
