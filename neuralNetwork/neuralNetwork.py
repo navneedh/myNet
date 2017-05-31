@@ -29,7 +29,7 @@ class NeuralNetwork:
         #print(finalValue)
         #print(Y[0])
         errorVal = lossDict[errorFunc](finalValue, Y[0])
-        self.backwardProp(errorVal, errorFunc)
+        self.backwardProp(errorVal, errorFunc, Y[0])
 
         #for sample in data:
             #forwardProp()
@@ -40,16 +40,10 @@ class NeuralNetwork:
         for i in range(len(self.layerArray) - 1): #default sigmoid activation
             oneVal = np.dot(self.layerArray[i].weights,oneVal)
             vfunc = np.vectorize(actDict[self.layerArray[i + 1].actFunc])
-            print(self.layerArray[i].weights.shape)
-            print(self.layerArray[i].partialDer.shape)
-            print(self.layerArray[i].weights)
 
             #partial derivative calculation
             for x in range(self.layerArray[i].weights.shape[0]):
                 for y in range (self.layerArray[i].weights.shape[1]):
-                    print(x, y)
-                    print(inputData)  
-                    print(oneVal)
                     self.layerArray[i].partialDer[x,y] = inputData[y] * derDict['derSig'](oneVal[x])
 
             inputData = oneVal
@@ -61,9 +55,14 @@ class NeuralNetwork:
             # print("**********")
         return oneVal
 
-    def backwardProp(self, error, loss_function):
-        totalErrorDerivative = derDict[loss_function](error) #need to write the actual method
+    def backwardProp(self, error, loss_function, true_error):
 
+        totalErrorDerivative = derDict[loss_function](true_error, error) #need to write the actual method
+        for i in range(len(self.derArray)):
+            index = len(self.derArray) - i - 1
+            self.derArray[index] = np.multiply(totalErrorDerivative, self.derArray[index])
+            totalErrorDerivative = self.derArray[index]
+            print(totalErrorDerivative)
 
     def toString(self):
         for layer in self.layerArray:

@@ -54,5 +54,8 @@ def l2(actual, expected):
 def derSigmoid(x):
     return math.exp(-x)/(math.pow((1 + math.exp(-x)),2))
 
-def derLogLoss(x):
-    return 
+def derLogLoss(true_error, x):
+    if true_error == 1:
+        return -1/x #this does natural log
+    elif true_error == 0:
+        return 1/(1-x)
