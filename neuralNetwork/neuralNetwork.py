@@ -8,7 +8,7 @@ actDict = {'sigmoid': cp.sigmoid, 'relu': cp.relu, 'tanh' : cp.tanh}
 
 lossDict = {'softmax':cp.softmax, 'logistic':cp.logistic}
 
-derDict = {'derSig' : cp.derSigmoid}
+derDict = {'derSig' : cp.derSigmoid, 'logistic' : cp.derLogLoss}
 
 class NeuralNetwork:
 
@@ -21,6 +21,7 @@ class NeuralNetwork:
         self.trials = 0
         self.computation = cp.Computation(self)
         self.weightArray = []
+        self.derArray = []
 
     def train(self,X,Y,errorFunc="logistic"): #probably need to create another train function for multiclass
         self.layerArray[0].neurons = X[0]
@@ -43,7 +44,7 @@ class NeuralNetwork:
             print(self.layerArray[i].partialDer.shape)
             print(self.layerArray[i].weights)
 
-            #partial derivative calculation 
+            #partial derivative calculation
             for x in range(self.layerArray[i].weights.shape[0]):
                 for y in range (self.layerArray[i].weights.shape[1]):
                     print(x, y)
@@ -61,7 +62,8 @@ class NeuralNetwork:
         return oneVal
 
     def backwardProp(self, error, loss_function):
-        pass
+        totalErrorDerivative = derDict[loss_function](error) #need to write the actual method
+
 
     def toString(self):
         for layer in self.layerArray:
@@ -93,6 +95,7 @@ class NeuralNetwork:
                 prevLayer.weights = layer.createMatrix(layer.size, prevSize, initialize)
                 prevLayer.partialDer = layer.createMatrix(layer.size, prevSize, 'zeros')
                 #layer.aMatrix = prevLayer.weights
+                network.derArray.append(prevLayer.partialDer)
                 network.weightArray.append(prevLayer.weights)
                 network.layerSizes.append(layer.size)
                 prevSize, prevLayer = layer.size, layer
