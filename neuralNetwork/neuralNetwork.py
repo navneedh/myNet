@@ -48,7 +48,7 @@ class NeuralNetwork:
             for x in range(self.layerArray[i].weights.shape[0]):
                 for y in range (self.layerArray[i].weights.shape[1]):
                     print(x, y)
-                    print(inputData)
+                    print(inputData) 
                     print(oneVal)
                     self.layerArray[i].partialDer[x,y] = inputData[y] * derDict['derSig'](oneVal[x])
 
