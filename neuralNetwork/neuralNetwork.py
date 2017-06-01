@@ -24,13 +24,12 @@ class NeuralNetwork:
         self.derArray = []
 
     def train(self,X,Y,errorFunc="logistic", learning_rate = 0.1): #probably need to create another train function for multiclass
-        for sample in data:
-            self.layerArray[0].neurons = X[0]
-            finalValue = self.forwardProp(X[0])[0]
-            #print(finalValue)
-            #print(Y[0])
-            errorVal = lossDict[errorFunc](finalValue, Y[0])
-            self.backwardProp(errorVal, errorFunc, Y[0], learning_rate)
+        for index in range(4):
+            self.layerArray[index].neurons = X[index]
+            finalValue = self.forwardProp(X[index])[0]
+            errorVal = lossDict[errorFunc](finalValue, Y[index])
+            self.backwardProp(errorVal, errorFunc, Y[index], learning_rate)
+            print(errorVal)
 
     def forwardProp(self, inputData):
         oneVal = inputData
