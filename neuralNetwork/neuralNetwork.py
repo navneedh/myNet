@@ -57,10 +57,17 @@ class NeuralNetwork:
 
     def backwardProp(self, error, loss_function, true_error):
 
-        totalErrorDerivative = derDict[loss_function](true_error, error) #need to write the actual method
+        totalErrorDerivative = [derDict[loss_function](true_error, error)] #need to write the actual method
         for i in range(len(self.derArray)):
             index = len(self.derArray) - i - 1
-            self.derArray[index] = np.multiply(totalErrorDerivative, self.derArray[index])
+            print(totalErrorDerivative)
+            count = 0
+            for errorVal in totalErrorDerivative:
+                if count == 0:
+                    self.derArray[index] = np.multiply(errorVal, self.derArray[index])
+                elif count > 0:
+                    self.derArray[index] += np.multiply(errorVal, self.derArray[index])
+                count += 1
             totalErrorDerivative = self.derArray[index]
             print(totalErrorDerivative)
 
