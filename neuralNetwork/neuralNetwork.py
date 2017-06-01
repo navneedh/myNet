@@ -23,17 +23,14 @@ class NeuralNetwork:
         self.weightArray = []
         self.derArray = []
 
-    def train(self,X,Y,errorFunc="logistic"): #probably need to create another train function for multiclass
-        self.layerArray[0].neurons = X[0]
-        finalValue = self.forwardProp(X[0])[0]
-        #print(finalValue)
-        #print(Y[0])
-        errorVal = lossDict[errorFunc](finalValue, Y[0])
-        self.backwardProp(errorVal, errorFunc, Y[0])
-
-        #for sample in data:
-            #forwardProp()
-            #backwardProp()
+    def train(self,X,Y,errorFunc="logistic", learning_rate = 0.1): #probably need to create another train function for multiclass
+        for sample in data:
+            self.layerArray[0].neurons = X[0]
+            finalValue = self.forwardProp(X[0])[0]
+            #print(finalValue)
+            #print(Y[0])
+            errorVal = lossDict[errorFunc](finalValue, Y[0])
+            self.backwardProp(errorVal, errorFunc, Y[0], learning_rate)
 
     def forwardProp(self, inputData):
         oneVal = inputData
@@ -55,21 +52,20 @@ class NeuralNetwork:
             # print("**********")
         return oneVal
 
-    def backwardProp(self, error, loss_function, true_error):
+    def backwardProp(self, error, loss_function, true_error, learning_rate):
 
-        totalErrorDerivative = [derDict[loss_function](true_error, error)] #need to write the actual method
+        totalErrorDerivative = [[derDict[loss_function](true_error, error)]] #need to write the actual method
         for i in range(len(self.derArray)):
             index = len(self.derArray) - i - 1
-            print(totalErrorDerivative)
             count = 0
-            for errorVal in totalErrorDerivative:
+            for errorVal in totalErrorDerivative[0]:
                 if count == 0:
                     self.derArray[index] = np.multiply(errorVal, self.derArray[index])
                 elif count > 0:
                     self.derArray[index] += np.multiply(errorVal, self.derArray[index])
                 count += 1
+            self.weightArray[index] = self.weightArray[index] - np.multiply(self.derArray[index], learning_rate)
             totalErrorDerivative = self.derArray[index]
-            print(totalErrorDerivative)
 
     def toString(self):
         for layer in self.layerArray:
