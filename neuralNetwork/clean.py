@@ -9,6 +9,7 @@ from sklearn.cross_validation import KFold
 from sklearn import cross_validation
 from sklearn import svm
 from sklearn.neural_network import MLPClassifier
+import subprocess
 
 def normalize(s):
     return (s + s.mean())/s.std()
@@ -33,5 +34,10 @@ df.Fare = normalize(df.Fare)
 df = df.drop('Name',1)
 df = df.drop('Cabin',1)
 df = df.drop('Ticket',1)
+df = df.drop('PassengerId', 1)
 
+survive = df.Survived
+df.drop('Survived', axis = 1)
+df.insert(8,'Y',survive)
+print(df.shape)
 print(df)

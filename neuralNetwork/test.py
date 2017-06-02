@@ -2,8 +2,10 @@ import numpy as np
 import pandas as pd
 import csv
 import neuralNetwork as net
+from clean import df
 
-data = pd.read_csv('../trainingData/testData1.csv', header=0).as_matrix()
+data=df.as_matrix()
+#data = pd.read_csv('../trainingData/testData1.csv', header=0).as_matrix()
 print(data)
 X = (data[:,0:data.shape[1]-1])
 Y = data[:,data.shape[1] - 1]
@@ -12,9 +14,9 @@ Y = data[:,data.shape[1] - 1]
 #need to create an input output framework
 #vector one
 #vector two
-hLayer1 = net.ly.Layer(1, 'sigmoid')
+hLayer1 = net.ly.Layer(5, 'sigmoid')
 #vector three
-outputLayer = net.ly.Layer(2, 'sigmoid')
+outputLayer = net.ly.Layer(3, 'sigmoid')
 
 net.NeuralNetwork.constructNet(X, hLayer1, outputLayer)
 
