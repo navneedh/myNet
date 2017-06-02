@@ -4,7 +4,7 @@ import csv
 import neuralNetwork as net
 
 data = pd.read_csv('../trainingData/testData1.csv', header=0).as_matrix()
-
+print(data)
 X = (data[:,0:data.shape[1]-1])
 Y = data[:,data.shape[1] - 1]
 

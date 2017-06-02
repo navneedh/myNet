@@ -6,6 +6,7 @@ class Computation:
         self.forPropValue = 0
         self.backPropValue = 0
         self.totalError = 0
+        self.errorArray = []
 
 #activation functions
 def sigmoid(x):

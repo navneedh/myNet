@@ -1,6 +1,7 @@
 import numpy as np
 import layer as ly
 import computation as cp
+import matplotlib.pyplot as plt
 
 
 #constants
@@ -23,13 +24,18 @@ class NeuralNetwork:
         self.weightArray = []
         self.derArray = []
 
-    def train(self,X,Y,errorFunc="logistic", learning_rate = 0.1): #probably need to create another train function for multiclass
-        for index in range(4):
-            self.layerArray[index].neurons = X[index]
-            finalValue = self.forwardProp(X[index])[0]
-            errorVal = lossDict[errorFunc](finalValue, Y[index])
-            self.backwardProp(errorVal, errorFunc, Y[index], learning_rate)
-            print(errorVal)
+    def train(self,X,Y,errorFunc="logistic", learning_rate = 0.4, batchSize = 40): #probably need to create another train function for multiclass
+        status = "*"
+        for batchCount in range(batchSize):
+            for index in range(6):
+                self.layerArray[0].neurons = X[index]
+                finalValue = self.forwardProp(X[index])[0]
+                errorVal = lossDict[errorFunc](finalValue, Y[index])
+                self.backwardProp(errorVal, errorFunc, Y[index], learning_rate)
+                self.computation.errorArray.append(errorVal)
+            print(str(batchCount/batchSize) + "% Complete")
+        plt.plot(self.computation.errorArray)
+        plt.show()
 
     def forwardProp(self, inputData):
         oneVal = inputData
@@ -45,10 +51,7 @@ class NeuralNetwork:
             inputData = oneVal
             oneVal = vfunc(oneVal)
             #oneVal = np.apply_along_axis(self.computation.relu, 0, [oneVal])[0]
-
             self.layerArray[i+1].neurons = oneVal
-            # print(oneVal)
-            # print("**********")
         return oneVal
 
     def backwardProp(self, error, loss_function, true_error, learning_rate):
