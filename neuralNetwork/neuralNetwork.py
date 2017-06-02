@@ -9,7 +9,7 @@ actDict = {'sigmoid': cp.sigmoid, 'relu': cp.relu, 'tanh' : cp.tanh}
 
 lossDict = {'softmax':cp.softmax, 'logistic':cp.logistic}
 
-derDict = {'derSig' : cp.derSigmoid, 'logistic' : cp.derLogLoss}
+derDict = {'derSig' : cp.derSigmoid, 'logistic' : cp.derLogLoss, 'derRelu': cp.derRelu}
 
 class NeuralNetwork:
 
@@ -24,18 +24,18 @@ class NeuralNetwork:
         self.weightArray = []
         self.derArray = []
 
-    def train(self,X,Y,errorFunc="logistic", learning_rate = 0.4, batchSize = 40): #probably need to create another train function for multiclass
+    def train(self,X,Y,errorFunc="logistic", learning_rate = 0.4, batchSize = 1): #probably need to create another train function for multiclass
         status = "*"
         for batchCount in range(batchSize):
-            for index in range(6):
+            for index in range(10):
                 self.layerArray[0].neurons = X[index]
                 finalValue = self.forwardProp(X[index])[0]
                 errorVal = lossDict[errorFunc](finalValue, Y[index])
                 self.backwardProp(errorVal, errorFunc, Y[index], learning_rate)
                 self.computation.errorArray.append(errorVal)
-            print(str(batchCount/batchSize) + "% Complete")
-        plt.plot(self.computation.errorArray)
-        plt.show()
+            #print(str(batchCount/batchSize) * 100 + "% Complete")
+        #plt.plot(self.computation.errorArray)
+        #plt.show()
 
     def forwardProp(self, inputData):
         oneVal = inputData
@@ -46,7 +46,8 @@ class NeuralNetwork:
             #partial derivative calculation
             for x in range(self.layerArray[i].weights.shape[0]):
                 for y in range (self.layerArray[i].weights.shape[1]):
-                    self.layerArray[i].partialDer[x,y] = inputData[y] * derDict['derSig'](oneVal[x])
+                    self.layerArray[i].partialDer[x,y] = inputData[y] * derDict['derRelu'](oneVal[x])
+                    self.derArray[i][x,y] = self.layerArray[i].partialDer[x,y]
 
             inputData = oneVal
             oneVal = vfunc(oneVal)
@@ -58,16 +59,22 @@ class NeuralNetwork:
 
         totalErrorDerivative = [[derDict[loss_function](true_error, error)]] #need to write the actual method
         for i in range(len(self.derArray)):
+
             index = len(self.derArray) - i - 1
+            #print(self.derArray[index])
             count = 0
             for errorVal in totalErrorDerivative[0]:
+                #print(errorVal)
                 if count == 0:
+                    print("E", errorVal)
                     self.derArray[index] = np.multiply(errorVal, self.derArray[index])
                 elif count > 0:
                     self.derArray[index] += np.multiply(errorVal, self.derArray[index])
                 count += 1
+                print("Done", count)
             self.weightArray[index] = self.weightArray[index] - np.multiply(self.derArray[index], learning_rate)
             totalErrorDerivative = self.derArray[index]
+            print(self.derArray[index])
 
     def toString(self):
         for layer in self.layerArray:

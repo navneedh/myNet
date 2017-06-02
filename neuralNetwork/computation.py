@@ -60,3 +60,9 @@ def derLogLoss(true_error, x):
         return -1/x #this does natural log
     elif true_error == 0:
         return 1/(1-x)
+
+def derRelu(x):
+    if x <= 0:
+        return 0
+    else:
+        return 1

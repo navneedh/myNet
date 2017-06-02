@@ -14,9 +14,9 @@ Y = data[:,data.shape[1] - 1]
 #need to create an input output framework
 #vector one
 #vector two
-hLayer1 = net.ly.Layer(5, 'sigmoid')
+hLayer1 = net.ly.Layer(2, 'relu')
 #vector three
-outputLayer = net.ly.Layer(3, 'sigmoid')
+outputLayer = net.ly.Layer(3, 'relu')
 
 net.NeuralNetwork.constructNet(X, hLayer1, outputLayer)
 

@@ -39,5 +39,3 @@ df = df.drop('PassengerId', 1)
 survive = df.Survived
 df.drop('Survived', axis = 1)
 df.insert(8,'Y',survive)
-print(df.shape)
-print(df)
