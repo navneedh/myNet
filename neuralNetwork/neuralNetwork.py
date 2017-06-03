@@ -28,11 +28,11 @@ class NeuralNetwork:
         status = "*"
         errorVal = 0 #new change
         for batchCount in range(batchSize):
-            for index in range(10):
+            for index in range(10): #training set size
                 self.layerArray[0].neurons = X[index]
                 finalValue = self.forwardProp(X[index])[0]
                 errorVal += lossDict[errorFunc](finalValue, Y[index])
-                #self.backwardProp(errorVal, errorFunc, Y[index], learning_rate)
+                self.backwardProp(errorVal, errorFunc, Y[index], learning_rate, finalValue)
                 self.computation.errorArray.append(errorVal)
             #print(str(batchCount/batchSize) * 100 + "% Complete")
         #plt.plot(self.computation.errorArray)
@@ -43,8 +43,6 @@ class NeuralNetwork:
         for i in range(len(self.layerArray) - 1): #default sigmoid activation
             nextVal = np.dot(self.layerArray[i].weights,nextVal)
             vfunc = np.vectorize(actDict['sigmoid'])
-            print("previous", inputData)
-            print("after", nextVal)
             #partial derivative calculation
             for x in range(self.layerArray[i].weights.shape[0]):
                 for y in range (self.layerArray[i].weights.shape[1]):
@@ -56,22 +54,18 @@ class NeuralNetwork:
             self.layerArray[i+1].neurons = nextVal
         return nextVal
 
-    def backwardProp(self, error, loss_function, true_error, learning_rate):
-
-        totalErrorDerivative = [[derDict[loss_function](true_error, error)]] #need to write the actual method
-        for i in range(len(self.derArray)):
-            index = len(self.derArray) - i - 1
-            #print(self.derArray[index])
+    def backwardProp(self, error, loss_function, true_error, learning_rate, finalValue):
+        totalErrorDerivative = derDict[loss_function](true_error, finalValue) #need to write the actual method
+        prog = np.array([totalErrorDerivative])
+        print("array" ,prog)
+        for index in reversed(range(len(self.derArray))):
             count = 0
-            for errorVal in totalErrorDerivative[0]:
-                #print(errorVal)
-                if count == 0:
-                    print("E", errorVal)
-                    self.derArray[index] = np.multiply(errorVal, self.derArray[index])
-                elif count > 0:
-                    self.derArray[index] += np.multiply(errorVal, self.derArray[index])
-                count += 1
-                print("Done", count)
+            for errorIndex in len(prog):
+                print("E", errorVal)
+                self.derArray[index] = np.multiply(prog[errorIndex], self.derArray[errorIndex])
+
+            temp = self.weightArray[index]
+            prog = prog
             self.weightArray[index] = self.weightArray[index] - np.multiply(self.derArray[index], learning_rate)
             totalErrorDerivative = self.derArray[index]
             print(self.derArray[index])
