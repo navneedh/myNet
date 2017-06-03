@@ -26,40 +26,40 @@ class NeuralNetwork:
 
     def train(self,X,Y,errorFunc="logistic", learning_rate = 0.4, batchSize = 1): #probably need to create another train function for multiclass
         status = "*"
+        errorVal = 0 #new change
         for batchCount in range(batchSize):
             for index in range(10):
                 self.layerArray[0].neurons = X[index]
                 finalValue = self.forwardProp(X[index])[0]
-                errorVal = lossDict[errorFunc](finalValue, Y[index])
-                self.backwardProp(errorVal, errorFunc, Y[index], learning_rate)
+                errorVal += lossDict[errorFunc](finalValue, Y[index])
+                #self.backwardProp(errorVal, errorFunc, Y[index], learning_rate)
                 self.computation.errorArray.append(errorVal)
             #print(str(batchCount/batchSize) * 100 + "% Complete")
         #plt.plot(self.computation.errorArray)
         #plt.show()
 
     def forwardProp(self, inputData):
-        oneVal = inputData
+        nextVal = inputData
         for i in range(len(self.layerArray) - 1): #default sigmoid activation
-            oneVal = np.dot(self.layerArray[i].weights,oneVal)
-            vfunc = np.vectorize(actDict[self.layerArray[i + 1].actFunc])
-
+            nextVal = np.dot(self.layerArray[i].weights,nextVal)
+            vfunc = np.vectorize(actDict['sigmoid'])
+            print("previous", inputData)
+            print("after", nextVal)
             #partial derivative calculation
             for x in range(self.layerArray[i].weights.shape[0]):
                 for y in range (self.layerArray[i].weights.shape[1]):
-                    self.layerArray[i].partialDer[x,y] = inputData[y] * derDict['derSigmoid'](oneVal[x])
+                    self.layerArray[i].partialDer[x,y] = inputData[y] * derDict['derSig'](nextVal[x])
                     self.derArray[i][x,y] = self.layerArray[i].partialDer[x,y]
 
-            inputData = oneVal
-            oneVal = vfunc(oneVal)
-            #oneVal = np.apply_along_axis(self.computation.relu, 0, [oneVal])[0]
-            self.layerArray[i+1].neurons = oneVal
-        return oneVal
+            inputData = nextVal
+            nextVal = vfunc(nextVal)
+            self.layerArray[i+1].neurons = nextVal
+        return nextVal
 
     def backwardProp(self, error, loss_function, true_error, learning_rate):
 
         totalErrorDerivative = [[derDict[loss_function](true_error, error)]] #need to write the actual method
         for i in range(len(self.derArray)):
-
             index = len(self.derArray) - i - 1
             #print(self.derArray[index])
             count = 0
