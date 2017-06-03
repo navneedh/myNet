@@ -10,13 +10,12 @@ print(data)
 X = (data[:,0:data.shape[1]-1])
 Y = data[:,data.shape[1] - 1]
 
-
 #need to create an input output framework
 #vector one
 #vector two
-hLayer1 = net.ly.Layer(2, 'relu')
+hLayer1 = net.ly.Layer(2, 'sigmoid')
 #vector three
-outputLayer = net.ly.Layer(3, 'relu')
+outputLayer = net.ly.Layer(3, 'sigmoid')
 
 net.NeuralNetwork.constructNet(X, hLayer1, outputLayer)
 

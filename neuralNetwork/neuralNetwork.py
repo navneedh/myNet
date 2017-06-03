@@ -46,7 +46,7 @@ class NeuralNetwork:
             #partial derivative calculation
             for x in range(self.layerArray[i].weights.shape[0]):
                 for y in range (self.layerArray[i].weights.shape[1]):
-                    self.layerArray[i].partialDer[x,y] = inputData[y] * derDict['derRelu'](oneVal[x])
+                    self.layerArray[i].partialDer[x,y] = inputData[y] * derDict['derSigmoid'](oneVal[x])
                     self.derArray[i][x,y] = self.layerArray[i].partialDer[x,y]
 
             inputData = oneVal
