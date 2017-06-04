@@ -53,8 +53,8 @@ def l2(actual, expected):
 #derivatives
 
 def derSigmoid(x):
-    #return math.exp(-x)/(math.pow((1 + math.exp(-x)),2))
-    return x * (1-x)
+    return math.exp(-x)/(math.pow((1 + math.exp(-x)),2))
+    #return x * (1-x)
 
 def derLogLoss(true_error, x):
     if true_error == 1:

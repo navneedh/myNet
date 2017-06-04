@@ -24,16 +24,18 @@ class NeuralNetwork:
         self.weightArray = []
         self.derArray = []
 
-    def train(self,X,Y,errorFunc="logistic", learning_rate = 0.4, batchSize = 1): #probably need to create another train function for multiclass
+    def train(self,X,Y,errorFunc="logistic", learning_rate = 0.5, batchSize = 1): #probably need to create another train function for multiclass
         status = "*"
         errorVal = 0 #new change
         for batchCount in range(batchSize):
-            for index in range(10): #training set size
+            for index in range(20): #training set size
                 self.layerArray[0].neurons = X[index]
                 finalValue = self.forwardProp(X[index])[0]
-                errorVal += lossDict[errorFunc](finalValue, Y[index])
+                print(finalValue)
+                errorVal = lossDict[errorFunc](finalValue, Y[index])
                 self.backwardProp(errorVal, errorFunc, Y[index], learning_rate, finalValue)
                 self.computation.errorArray.append(errorVal)
+                print(errorVal)
             #print(str(batchCount/batchSize) * 100 + "% Complete")
         #plt.plot(self.computation.errorArray)
         #plt.show()
@@ -43,32 +45,41 @@ class NeuralNetwork:
         for i in range(len(self.layerArray) - 1): #default sigmoid activation
             nextVal = np.dot(self.layerArray[i].weights,nextVal)
             vfunc = np.vectorize(actDict['sigmoid'])
+            derfunc = np.vectorize(derDict['derSig'])
             #partial derivative calculation
             for x in range(self.layerArray[i].weights.shape[0]):
                 for y in range (self.layerArray[i].weights.shape[1]):
                     self.layerArray[i].partialDer[x,y] = inputData[y] * derDict['derSig'](nextVal[x])
                     self.derArray[i][x,y] = self.layerArray[i].partialDer[x,y]
 
-            inputData = nextVal
+            self.layerArray[i+1].preActNeurons = derfunc(nextVal)
             nextVal = vfunc(nextVal)
+            inputData = nextVal
             self.layerArray[i+1].neurons = nextVal
         return nextVal
 
     def backwardProp(self, error, loss_function, true_error, learning_rate, finalValue):
-        totalErrorDerivative = derDict[loss_function](true_error, finalValue) #need to write the actual method
+        totalErrorDerivative = derDict['derSig'](finalValue)
+        #print(totalErrorDerivative)
         prog = np.array([totalErrorDerivative])
-        print("array" ,prog)
         for index in reversed(range(len(self.derArray))):
-            count = 0
-            for errorIndex in len(prog):
-                print("E", errorVal)
-                self.derArray[index] = np.multiply(prog[errorIndex], self.derArray[errorIndex])
+            finalGradients = []
+            for col in range(self.derArray[index].shape[1]):
+                finalGradients.append(np.multiply(prog, self.derArray[index][:, col]))
+            finalGradients = np.array(finalGradients).T
 
-            temp = self.weightArray[index]
-            prog = prog
-            self.weightArray[index] = self.weightArray[index] - np.multiply(self.derArray[index], learning_rate)
-            totalErrorDerivative = self.derArray[index]
-            print(self.derArray[index])
+            #print("finalG", finalGradients)
+
+            #preparing the next prog matrix for next backprop step
+            temp = []
+            for col in range(self.weightArray[index].T.shape[1]):
+                temp.append(np.multiply(self.layerArray[index].preActNeurons, self.weightArray[index].T[:,col]))
+
+            prog = np.dot(prog, temp)
+
+            #gradient descent
+            self.weightArray[index] = self.weightArray[index] - np.multiply(finalGradients, learning_rate)
+            #print(self.weightArray[index])
 
     def toString(self):
         for layer in self.layerArray:
