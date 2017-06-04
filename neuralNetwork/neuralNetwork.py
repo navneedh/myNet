@@ -24,11 +24,11 @@ class NeuralNetwork:
         self.weightArray = []
         self.derArray = []
 
-    def train(self,X,Y,errorFunc="logistic", learning_rate = 0.5, batchSize = 1): #probably need to create another train function for multiclass
+    def train(self,X,Y,errorFunc="logistic", learning_rate = 2.3, batchSize = 200): #probably need to create another train function for multiclass
         status = "*"
         errorVal = 0 #new change
         for batchCount in range(batchSize):
-            for index in range(20): #training set size
+            for index in range(800): #training set size
                 self.layerArray[0].neurons = X[index]
                 finalValue = self.forwardProp(X[index])[0]
                 print(finalValue)
@@ -37,8 +37,8 @@ class NeuralNetwork:
                 self.computation.errorArray.append(errorVal)
                 print(errorVal)
             #print(str(batchCount/batchSize) * 100 + "% Complete")
-        #plt.plot(self.computation.errorArray)
-        #plt.show()
+        plt.plot(self.computation.errorArray)
+        plt.show()
 
     def forwardProp(self, inputData):
         nextVal = inputData
@@ -59,7 +59,7 @@ class NeuralNetwork:
         return nextVal
 
     def backwardProp(self, error, loss_function, true_error, learning_rate, finalValue):
-        totalErrorDerivative = derDict['derSig'](finalValue)
+        totalErrorDerivative = derDict[loss_function](true_error, finalValue)
         #print(totalErrorDerivative)
         prog = np.array([totalErrorDerivative])
         for index in reversed(range(len(self.derArray))):
@@ -68,7 +68,7 @@ class NeuralNetwork:
                 finalGradients.append(np.multiply(prog, self.derArray[index][:, col]))
             finalGradients = np.array(finalGradients).T
 
-            #print("finalG", finalGradients)
+            # print("finalG", finalGradients)
 
             #preparing the next prog matrix for next backprop step
             temp = []

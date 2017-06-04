@@ -20,7 +20,7 @@ class Layer:
 
     def createMatrix(self, x, y, initialize):
         if initialize == 'gaussian':
-            initialArray = np.random.normal(0,0.2,x*y)
+            initialArray = np.random.normal(0,0.8,x*y)
             matrix = initialArray.reshape((x,y))
             return matrix
         elif initialize == 'zeros':
