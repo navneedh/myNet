@@ -14,14 +14,14 @@ def calcDistance(arr1, arr2):
 def average(vals):
     return np.mean(vals, axis=0)
 
-
-def train(values=100, dimensions=2, blobNum=4, NUM_CENTROIDS=4, ITERATIONS=1000):
-    global x
-    global y
-    global centroids
-    global seedCentroids
+def trainingData(values, dimensions, blobNum):
     data = (make_blobs(values,dimensions,blobNum)[0])
     x, y = zip(*data)
+    return x, y
+
+def train(x,y,NUM_CENTROIDS=4, ITERATIONS=1000):
+    global centroids
+    global seedCentroids
     data = []
     for i in range(len(x)):
         data.append([[x[i],y[i]],0])
@@ -59,6 +59,16 @@ def train(values=100, dimensions=2, blobNum=4, NUM_CENTROIDS=4, ITERATIONS=1000)
                 centroids_copy.append(average(valsToAvg[key]).tolist())
 
         centroids = centroids_copy
+
+
+def trainFull(values=100, dimensions=2, blobNum=4, NUM_CENTROIDS=4, ITERATIONS=1000):
+    global x
+    global y
+    global centroids
+    global seedCentroids
+    data = (make_blobs(values,dimensions,blobNum)[0])
+    x, y = zip(*data)
+    train(x,y,NUM_CENTROIDS,ITERATIONS)
 
 def graph():
     plt.plot(x,y, 'ro')
