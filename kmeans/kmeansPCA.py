@@ -21,7 +21,7 @@ x_training = U[:,0]
 X = np.zeros([None,100])
 Y = y_training
 
-def trainingData():    
+def trainingData():
 
 #create an ensemble method basically using different weights of three mechanisms depending on value of principal component
 
