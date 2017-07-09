@@ -40,6 +40,6 @@ weight = {'W1': weights([100,60]), 'W2': weights([60,40]), 'W3': weights([40,10]
 biases = {'B1': bias(60), 'B2': bias(40), 'B3': bias(10)}
 
 def neuralNet():
-    l1 = tf.matmul(x,)
+    l1 = tf.matmul(x,) 
 
 sess.run(tf.global_variables_initializer())
