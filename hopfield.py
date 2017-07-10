@@ -34,7 +34,6 @@ def create_W(x):
 #Update
 def update(w,y_vec,theta=0.5):
     u = np.dot(w,y_vec) - theta
-    u[u>=1] = 1
     u[u<1] = 0
     #try using a relu instead to preserve using numbers other than 1 and -1
     return u
