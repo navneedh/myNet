@@ -70,12 +70,15 @@ def trainFull(values=100, dimensions=2, blobNum=4, NUM_CENTROIDS=4, ITERATIONS=1
     x, y = zip(*data)
     train(x,y,NUM_CENTROIDS,ITERATIONS)
 
-def graph():
+def graphFull(x,y):
     plt.plot(x,y, 'ro')
     a, b = zip(*centroids)
     plt.plot(a, b, 'g^', linewidth=2.0)
     plt.show()
 
+def graph(x,y):
+    plt.plot(x,y, 'ro')
+    plt.show()
 
 if __name__ == '__main__':
     train()
