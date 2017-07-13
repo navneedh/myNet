@@ -3,14 +3,16 @@ import numpy as np
 import tensorflow as tf
 
 #hyperparameters
-BATCH = 10
+TRAININGSIZE = 1000
+BATCH = TRAININGSIZE//40
 EPOCHS = 100
+display_step = 1
 
 #create an ensemble method basically using different weights of three mechanisms depending on value of principal component
 sess = tf.InteractiveSession()
 
 #generate random y training cluster number values
-y_training = [np.random.randint(1,15) for x in range(BATCH)]
+y_training = [np.random.randint(1,15) for x in range(TRAININGSIZE)]
 
 def getXVector(points, dimension, clusters):
     x,y = km.trainingData(points,dimension,clusters)
@@ -28,10 +30,12 @@ x_training = [getXVector(100, 2, y) for y in y_training]
 
 #one hot encode y training vector
 
-y_training_onehot = [tf.one_hot([y], 15) for y in y_training]
+y_training_onehot = [tf.one_hot([y], 15).eval()[0] for y in y_training]
 
-x = tf.placeholder(tf.float32, shape=[100,None])
-y_ = tf.placeholder(tf.float32, shape=[15,None])
+print("Finished gathering training data")
+
+x = tf.placeholder(tf.float32, shape=[None,100])
+y_ = tf.placeholder(tf.float32, shape=[None,15])
 
 def weights(dimensions):
     return tf.Variable(tf.random_normal([dimensions[0], dimensions[1]],stddev=0.5))
@@ -53,7 +57,6 @@ def neuralNet():
     l2 = tf.nn.dropout(l2,0.8)
     return tf.matmul(l2, weights['W3']) + biases['B3']
 
-
 result = neuralNet()
 
 cost = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(logits=result, labels=y_))
@@ -62,20 +65,16 @@ init = tf.global_variables_initializer()
 
 with tf.Session() as sess:
     sess.run(init)
-
+    avg_cost = 0
     for epoch in range(EPOCHS):
         for i in range(BATCH):
-            batch_x = (np.array(x_training[i*10:(i+1)*10]))
-            batch_y = np.array(y_training_onehot[i*10:(i+1)*10])
-            print("dashjkhfjksdhfjksdfhkjsdfhkjsdhfkjsdhfkjsdfhkjsdhf")
-            print((batch_x).shape)
+            print(i)
+            batch_x = ((x_training[i*10:(i+4)*10]))
+            batch_y = (y_training_onehot[i*10:(i+4)*10])
             # Run optimization op (backprop) and cost op (to get loss value)
             c = sess.run(cost, feed_dict={x: batch_x, y_: batch_y})
             # Compute average loss
             avg_cost += c / BATCH
         if epoch % display_step == 0:
-            print("Epoch:", '%04d' % (epoch+1), "cost=", "{:.9f}".format(avg_cost))
+            print("Epoch:", '%04d' % (epoch+1), "cost=", "{:.9f}".format(c))
     print("Optimization Finished!")
-
-
-sess.run(tf.global_variables_initializer())
