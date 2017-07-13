@@ -77,4 +77,8 @@ with tf.Session() as sess:
             avg_cost += c / BATCH
         if epoch % display_step == 0:
             print("Epoch:", '%04d' % (epoch+1), "cost=", "{:.9f}".format(c))
-    print("Optimization Finished!")
+    print("Training Complete")
+
+    print("Execute Test")
+    testX = getXVector(100,2,5).T
+    print(sess.run(result, feed_dict={x: testX}))
