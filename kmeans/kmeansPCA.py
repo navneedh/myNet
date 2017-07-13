@@ -3,7 +3,11 @@ import numpy as np
 import tensorflow as tf
 
 #hyperparameters
-BATCH = 100
+BATCH = 10
+EPOCHS = 100
+
+#create an ensemble method basically using different weights of three mechanisms depending on value of principal component
+sess = tf.InteractiveSession()
 
 #generate random y training cluster number values
 y_training = [np.random.randint(1,15) for x in range(BATCH)]
@@ -15,43 +19,63 @@ def getXVector(points, dimension, clusters):
     matrix = np.vstack((x,y)).T
     U, S, V = np.linalg.svd(matrix, full_matrices=True)
 
-    #first principal component vector
+    # return first principal component vector
     x_training = U[:,0]
+
     return x_training
 
 x_training = [getXVector(100, 2, y) for y in y_training]
 
-#create an ensemble method basically using different weights of three mechanisms depending on value of principal component
-sess = tf.InteractiveSession()
+#one hot encode y training vector
 
-x = tf.placeholder(tf.float32, shape=[None,100])
-y_ = tf.placeholder(tf.float32, shape=[None,15])
+y_training_onehot = [tf.one_hot([y], 15) for y in y_training]
+
+x = tf.placeholder(tf.float32, shape=[100,None])
+y_ = tf.placeholder(tf.float32, shape=[15,None])
 
 def weights(dimensions):
-    return tf.get_variable("W", shape=[dimensions[0], dimensions[1]], initializer=tf.contrib.layers.xavier_initializer())
+    return tf.Variable(tf.random_normal([dimensions[0], dimensions[1]],stddev=0.5))
 
 def bias(dimension):
-    return tf.get_variable("b", shape=[dimension], initializer=tf.zeros_initializer())
+    return tf.Variable(tf.random_normal([dimension], stddev=0.5))
 
-weight = {'W1': weights([100,60]), 'W2': weights([60,40]), 'W3': weights([40,10])}
-biases = {'B1': bias(60), 'B2': bias(40), 'B3': bias(10)}
+weights = {'W1':weights([100,60]), 'W2':weights([60,40]), 'W3': weights([40,15])}
+biases = {'B1': bias(60), 'B2': bias(40), 'B3': bias(15)}
 
 def neuralNet():
-    x = tf.nn.dropout(x,20)
-    l1 = tf.relu(tf.matmul(x,weights['W1']) + biases['B1'])
+    x_d = tf.nn.dropout(x,0.8) #might need to fix these hyperparameters
+    l1 = tf.nn.relu(tf.matmul(x_d,weights['W1']) + biases['B1'])
 
-    l1 = tf.nn.dropout(l1,20)
-    l2 = tf.relu(tf.matmul(l1,weights['W2']) + biases['B2'])
+    l1 = tf.nn.dropout(l1,0.8)
+    l2 = tf.nn.relu(tf.matmul(l1,weights['W2']) + biases['B2'])
 
-    l2 = tf.nn.droupout(l2,20)
-    l3 = tf.matmul(l2, weights['W3']) + biases['B3']
+    #use batch normalization
+    l2 = tf.nn.dropout(l2,0.8)
+    return tf.matmul(l2, weights['W3']) + biases['B3']
 
-    return l3
 
 result = neuralNet()
 
-cost = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(logits=result, labels=Y))
-train_op = tf.train.RMSPropOptimizer(0.001, 0.9).minimize(cost)
+cost = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(logits=result, labels=y_))
+optimizer = tf.train.AdamOptimizer(0.001, 0.9).minimize(cost)
+init = tf.global_variables_initializer()
+
+with tf.Session() as sess:
+    sess.run(init)
+
+    for epoch in range(EPOCHS):
+        for i in range(BATCH):
+            batch_x = (np.array(x_training[i*10:(i+1)*10]))
+            batch_y = np.array(y_training_onehot[i*10:(i+1)*10])
+            print("dashjkhfjksdhfjksdfhkjsdfhkjsdhfkjsdhfkjsdfhkjsdhf")
+            print((batch_x).shape)
+            # Run optimization op (backprop) and cost op (to get loss value)
+            c = sess.run(cost, feed_dict={x: batch_x, y_: batch_y})
+            # Compute average loss
+            avg_cost += c / BATCH
+        if epoch % display_step == 0:
+            print("Epoch:", '%04d' % (epoch+1), "cost=", "{:.9f}".format(avg_cost))
+    print("Optimization Finished!")
 
 
 sess.run(tf.global_variables_initializer())
