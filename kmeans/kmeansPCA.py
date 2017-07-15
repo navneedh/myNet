@@ -114,7 +114,7 @@ for epoch in range(EPOCHS):
         avg_cost += c / BATCH
     if epoch % display_step == 0:
         print("Epoch:", '%04d' % (epoch+1), "cost=", "{:.9f}".format(c))
-print("Training Complete")
+print("Training Complete") 
 
 #
 # print("Execute Test")
