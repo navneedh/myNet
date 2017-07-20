@@ -63,7 +63,7 @@ def neuralNet():
 result = neuralNet()
 
 cost = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(logits=result, labels=y_))
-optimizer = tf.train.AdamOptimizer(0.001, 0.9).minimize(cost)
+optimizer = tf.train.AdamOptimizer(0.01, 0.9).minimize(cost)
 correct_prediction = tf.argmax(result,1) + 1
 
 with tf.Session() as sess:
