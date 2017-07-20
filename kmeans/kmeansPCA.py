@@ -8,9 +8,9 @@ import tensorflow as tf
 
 
 #hyperparameters
-TRAININGSIZE = 100
-BATCH = TRAININGSIZE//40
-EPOCHS = 100
+TRAININGSIZE = 5000
+BATCH = TRAININGSIZE//50
+EPOCHS = 1000
 display_step = 1
 
 #create an ensemble method basically using different weights of three mechanisms depending on value of principal component
@@ -31,13 +31,13 @@ def getXVector(points, dimension, clusters):
 
     return x_training
 
-x_training = [getXVector(100, 2, y) for y in y_training]
+x_training = [getXVector(50, 2, y) for y in y_training]
 
 y_training_onehot = [tf.one_hot([y], 15).eval()[0] for y in y_training]
 
 print("Finished gathering training data")
 
-x = tf.placeholder(tf.float32, shape=[None,100])
+x = tf.placeholder(tf.float32, shape=[None,50])
 y_ = tf.placeholder(tf.float32, shape=[None,15])
 
 def weights(dimensions):
@@ -46,12 +46,8 @@ def weights(dimensions):
 def bias(dimension):
     return tf.Variable(tf.random_normal([dimension], stddev=0.5))
 
-weights = {'W1':weights([100,60]), 'W2':weights([60,40]), 'W3': weights([40,15])}
-biases = {'B1': bias(60), 'B2': bias(40), 'B3': bias(15)}
-
-# init = tf.global_variables_initializer()
-#
-# sess.run(init)
+weights = {'W1':weights([50,35]), 'W2':weights([35,20]), 'W3': weights([20,15])}
+biases = {'B1': bias(35), 'B2': bias(20), 'B3': bias(15)}
 
 def neuralNet():
     x_d = tf.nn.dropout(x,0.8) #might need to fix these hyperparameters
@@ -70,21 +66,21 @@ cost = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(logits=result, lab
 optimizer = tf.train.AdamOptimizer(0.001, 0.9).minimize(cost)
 correct_prediction = tf.argmax(result,1)
 
-# avg_cost = 0
-# for epoch in range(EPOCHS):
-#     for i in range(BATCH):
-#         print(i)
-#         batch_x = np.array((x_training[i*10:(i+4)*10]))
-#         batch_y = (y_training_onehot[i*10:(i+4)*10])
-#         print("Batch x shape:", (batch_x).shape)
-#         # Run optimization op (backprop) and cost op (to get loss value)
-#         c = sess.run(cost, feed_dict={x: batch_x, y_: batch_y})
-#         # Compute average loss
-#         avg_cost += c / BATCH
-#     if epoch % display_step == 0:
-#         print("Epoch:", '%04d' % (epoch+1), "cost=", "{:.9f}".format(c))
-# print("Training Complete")
-#
+with tf.Session() as sess:
+    sess.run(tf.global_variables_initializer())
+    avg_cost = 0
+    for epoch in range(EPOCHS):
+        for i in range(BATCH):
+            batch_x = np.array((x_training[i*10:(i+5)*10]))
+            batch_y = np.array(y_training_onehot[i*10:(i+5)*10])
+            # Run optimization op (backprop) and cost op (to get loss value)
+            c = sess.run(cost, feed_dict={x: batch_x, y_: batch_y})
+            # Compute average loss
+            avg_cost += c / BATCH
+        if epoch % display_step == 0:
+            print("Epoch:", '%04d' % (epoch+1), "cost=", "{:.9f}".format(c))
+    print("Training Complete")
+
 #
 # print("Execute Test")
 # totalCorrect = 0
