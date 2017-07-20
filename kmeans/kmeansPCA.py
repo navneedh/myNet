@@ -49,9 +49,9 @@ def bias(dimension):
 weights = {'W1':weights([100,60]), 'W2':weights([60,40]), 'W3': weights([40,15])}
 biases = {'B1': bias(60), 'B2': bias(40), 'B3': bias(15)}
 
-init = tf.global_variables_initializer()
-
-sess.run(init)
+# init = tf.global_variables_initializer()
+#
+# sess.run(init)
 
 def neuralNet():
     x_d = tf.nn.dropout(x,0.8) #might need to fix these hyperparameters
@@ -70,32 +70,32 @@ cost = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(logits=result, lab
 optimizer = tf.train.AdamOptimizer(0.001, 0.9).minimize(cost)
 correct_prediction = tf.argmax(result,1)
 
-avg_cost = 0
-for epoch in range(EPOCHS):
-    for i in range(BATCH):
-        print(i)
-        batch_x = np.array((x_training[i*10:(i+4)*10]))
-        batch_y = (y_training_onehot[i*10:(i+4)*10])
-        print("Batch x shape:", (batch_x).shape)
-        # Run optimization op (backprop) and cost op (to get loss value)
-        c = sess.run(cost, feed_dict={x: batch_x, y_: batch_y})
-        # Compute average loss
-        avg_cost += c / BATCH
-    if epoch % display_step == 0:
-        print("Epoch:", '%04d' % (epoch+1), "cost=", "{:.9f}".format(c))
-print("Training Complete")
-
-
-print("Execute Test")
-totalCorrect = 0
-for _ in range(100):
-    number = np.random.randint(2,15)
-    testX = getXVector(100,2,number).T
-    testX = np.reshape(testX, (1,100))
-    prediction = (sess.run(correct_prediction, feed_dict={x: testX}))
-    print("Correct:", number)
-    if number == prediction:
-        totalCorrect += 1
-        print("It works")
-
-print("Testing Accuracy:", totalCorrect/100)
+# avg_cost = 0
+# for epoch in range(EPOCHS):
+#     for i in range(BATCH):
+#         print(i)
+#         batch_x = np.array((x_training[i*10:(i+4)*10]))
+#         batch_y = (y_training_onehot[i*10:(i+4)*10])
+#         print("Batch x shape:", (batch_x).shape)
+#         # Run optimization op (backprop) and cost op (to get loss value)
+#         c = sess.run(cost, feed_dict={x: batch_x, y_: batch_y})
+#         # Compute average loss
+#         avg_cost += c / BATCH
+#     if epoch % display_step == 0:
+#         print("Epoch:", '%04d' % (epoch+1), "cost=", "{:.9f}".format(c))
+# print("Training Complete")
+#
+#
+# print("Execute Test")
+# totalCorrect = 0
+# for _ in range(100):
+#     number = np.random.randint(2,15)
+#     testX = getXVector(100,2,number).T
+#     testX = np.reshape(testX, (1,100))
+#     prediction = (sess.run(correct_prediction, feed_dict={x: testX}))
+#     print("Correct:", number)
+#     if number == prediction:
+#         totalCorrect += 1
+#         print("It works")
+#
+# print("Testing Accuracy:", totalCorrect/100)
