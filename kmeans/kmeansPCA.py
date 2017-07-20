@@ -8,7 +8,7 @@ import tensorflow as tf
 
 
 #hyperparameters
-TRAININGSIZE = 5000
+TRAININGSIZE = 500
 BATCH = TRAININGSIZE//50
 EPOCHS = 1000
 display_step = 1
@@ -80,18 +80,17 @@ with tf.Session() as sess:
         if epoch % display_step == 0:
             print("Epoch:", '%04d' % (epoch+1), "cost=", "{:.9f}".format(c))
     print("Training Complete")
+    print("Execute Test")
+    totalCorrect = 0
+    for _ in range(100):
+        number = np.random.randint(2,15)
+        testX = getXVector(50,2,number).T
+        testX = np.reshape(testX, (1,50))
+        prediction = (sess.run(correct_prediction, feed_dict={x: testX}))
+        print("Prediction:", prediction)
+        print("Correct:", number)
+        if number == prediction:
+            totalCorrect += 1
+            print("It works")
 
-#
-# print("Execute Test")
-# totalCorrect = 0
-# for _ in range(100):
-#     number = np.random.randint(2,15)
-#     testX = getXVector(100,2,number).T
-#     testX = np.reshape(testX, (1,100))
-#     prediction = (sess.run(correct_prediction, feed_dict={x: testX}))
-#     print("Correct:", number)
-#     if number == prediction:
-#         totalCorrect += 1
-#         print("It works")
-#
-# print("Testing Accuracy:", totalCorrect/100)
+    print("Testing Accuracy:", totalCorrect/100)
