@@ -33,12 +33,12 @@ def getXVector(points, dimension, clusters):
 
 x_training = [getXVector(50, 2, y) for y in y_training]
 
-y_training_onehot = [tf.one_hot([y], 5).eval()[0] for y in y_training]
+y_training_onehot = [tf.one_hot([y], 4).eval()[0] for y in y_training]
 
 print("Finished gathering training data")
 
 x = tf.placeholder(tf.float32, shape=[None,50])
-y_ = tf.placeholder(tf.float32, shape=[None,5])
+y_ = tf.placeholder(tf.float32, shape=[None,4])
 
 def weights(dimensions):
     return tf.Variable(tf.random_normal([dimensions[0], dimensions[1]],stddev=0.5))
@@ -46,8 +46,8 @@ def weights(dimensions):
 def bias(dimension):
     return tf.Variable(tf.random_normal([dimension], stddev=0.5))
 
-weights = {'W1':weights([50,35]), 'W2':weights([35,20]), 'W3': weights([20,5])}
-biases = {'B1': bias(35), 'B2': bias(20), 'B3': bias(5)}
+weights = {'W1':weights([50,35]), 'W2':weights([35,20]), 'W3': weights([20,4])}
+biases = {'B1': bias(35), 'B2': bias(20), 'B3': bias(4)}
 
 def neuralNet():
     x_d = tf.nn.dropout(x,0.8) #might need to fix these hyperparameters
@@ -82,7 +82,7 @@ with tf.Session() as sess:
     print("Training Complete")
     print("Execute Test")
     totalCorrect = 0
-    for _ in range(100):
+    for _ in range(1000):
         number = np.random.randint(1,5)
         testX = getXVector(50,2,number).T
         testX = np.reshape(testX, (1,50))
@@ -93,4 +93,4 @@ with tf.Session() as sess:
             totalCorrect += 1
             print("It works")
 
-    print("Testing Accuracy:", totalCorrect/100)
+    print("Testing Accuracy:", totalCorrect/1000)
