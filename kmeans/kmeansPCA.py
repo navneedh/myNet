@@ -17,7 +17,7 @@ display_step = 1
 sess = tf.InteractiveSession()
 
 #generate random y training cluster number values
-y_training = [np.random.randint(1,15) for x in range(TRAININGSIZE)]
+y_training = [np.random.randint(1,5) for x in range(TRAININGSIZE)]
 
 def getXVector(points, dimension, clusters):
     x,y = km.trainingData(points,dimension,clusters)
@@ -33,12 +33,12 @@ def getXVector(points, dimension, clusters):
 
 x_training = [getXVector(50, 2, y) for y in y_training]
 
-y_training_onehot = [tf.one_hot([y], 15).eval()[0] for y in y_training]
+y_training_onehot = [tf.one_hot([y], 5).eval()[0] for y in y_training]
 
 print("Finished gathering training data")
 
 x = tf.placeholder(tf.float32, shape=[None,50])
-y_ = tf.placeholder(tf.float32, shape=[None,15])
+y_ = tf.placeholder(tf.float32, shape=[None,5])
 
 def weights(dimensions):
     return tf.Variable(tf.random_normal([dimensions[0], dimensions[1]],stddev=0.5))
@@ -46,8 +46,8 @@ def weights(dimensions):
 def bias(dimension):
     return tf.Variable(tf.random_normal([dimension], stddev=0.5))
 
-weights = {'W1':weights([50,35]), 'W2':weights([35,20]), 'W3': weights([20,15])}
-biases = {'B1': bias(35), 'B2': bias(20), 'B3': bias(15)}
+weights = {'W1':weights([50,35]), 'W2':weights([35,20]), 'W3': weights([20,5])}
+biases = {'B1': bias(35), 'B2': bias(20), 'B3': bias(5)}
 
 def neuralNet():
     x_d = tf.nn.dropout(x,0.8) #might need to fix these hyperparameters
@@ -64,7 +64,7 @@ result = neuralNet()
 
 cost = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(logits=result, labels=y_))
 optimizer = tf.train.AdamOptimizer(0.001, 0.9).minimize(cost)
-correct_prediction = tf.argmax(result,1)
+correct_prediction = tf.argmax(result,1) + 1
 
 with tf.Session() as sess:
     sess.run(tf.global_variables_initializer())
@@ -83,7 +83,7 @@ with tf.Session() as sess:
     print("Execute Test")
     totalCorrect = 0
     for _ in range(100):
-        number = np.random.randint(2,15)
+        number = np.random.randint(1,5)
         testX = getXVector(50,2,number).T
         testX = np.reshape(testX, (1,50))
         prediction = (sess.run(correct_prediction, feed_dict={x: testX}))
