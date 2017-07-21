@@ -74,7 +74,7 @@ with tf.Session() as sess:
             batch_x = np.array((x_training[i*10:(i+5)*10]))
             batch_y = np.array(y_training_onehot[i*10:(i+5)*10])
             # Run optimization op (backprop) and cost op (to get loss value)
-            c = sess.run(cost, feed_dict={x: batch_x, y_: batch_y})
+            c, _ = sess.run([cost, optimizer], feed_dict={x: batch_x, y_: batch_y})
             # Compute average loss
             avg_cost += c / BATCH
         if epoch % display_step == 0:
