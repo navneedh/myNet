@@ -81,7 +81,7 @@ with tf.Session() as sess:
             print("Epoch:", '%04d' % (epoch+1), "cost=", "{:.9f}".format(c))
     print("Training Complete")
     print("Execute Test")
-    totalCorrect = 0
+    totalCorrect = 0 
     for _ in range(1000):
         number = np.random.randint(1,5)
         testX = getXVector(50,2,number).T
