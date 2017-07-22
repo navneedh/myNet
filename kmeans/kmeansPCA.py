@@ -74,14 +74,14 @@ with tf.Session() as sess:
             batch_x = np.array((x_training[i*10:(i+5)*10]))
             batch_y = np.array(y_training_onehot[i*10:(i+5)*10])
             # Run optimization op (backprop) and cost op (to get loss value)
-            c, _ = sess.run([cost, optimizer], feed_dict={x: batch_x, y_: batch_y})
+            _, c = sess.run([optimizer, cost], feed_dict={x: batch_x, y_: batch_y})
             # Compute average loss
             avg_cost += c / BATCH
         if epoch % display_step == 0:
             print("Epoch:", '%04d' % (epoch+1), "cost=", "{:.9f}".format(c))
     print("Training Complete")
     print("Execute Test")
-    totalCorrect = 0 
+    totalCorrect = 0
     for _ in range(1000):
         number = np.random.randint(1,5)
         testX = getXVector(50,2,number).T
