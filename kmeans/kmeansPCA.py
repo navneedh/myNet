@@ -10,7 +10,7 @@ import matplotlib.pyplot as plt
 tf.InteractiveSession()
 
 #hyperparameters
-TRAININGSIZE = 400
+TRAININGSIZE = 500
 BATCH = 20
 EPOCHS = 1000
 display_step = 1
@@ -32,14 +32,13 @@ def getXVector(points, dimension, clusters):
 
     return x_training
 
-x_training = [getXVector(50, 2, y+1) for y in y_training]
+x_training = [getXVector(100, 2, y+1) for y in y_training]
 
 y_training_onehot = [tf.one_hot([y], 4).eval()[0] for y in y_training]
-print(y_training_onehot)
 
 print("Finished gathering training data")
 
-x = tf.placeholder(tf.float32, shape=[None,50])
+x = tf.placeholder(tf.float32, shape=[None,100])
 y_ = tf.placeholder(tf.float32, shape=[None,4])
 
 def weights(dimensions):
@@ -48,18 +47,18 @@ def weights(dimensions):
 def bias(dimension):
     return tf.Variable(tf.random_normal([dimension], stddev=0.5))
 
-weights = {'W1':weights([50,35]), 'W2':weights([35,20]), 'W3': weights([20,4])}
-biases = {'B1': bias(35), 'B2': bias(20), 'B3': bias(4)}
+weights = {'W1':weights([100,50]), 'W2':weights([50,20]), 'W3': weights([20,4])}
+biases = {'B1': bias(50), 'B2': bias(20), 'B3': bias(4)}
 
 def neuralNet():
     #x_d = tf.nn.dropout(x,0.8) #might need to fix these hyperparameters
     l1 = tf.nn.relu(tf.matmul(x,weights['W1']) + biases['B1'])
 
-    #l1 = tf.nn.dropout(l1,0.8)
+    l1 = tf.nn.dropout(l1,0.8)
     l2 = tf.nn.relu(tf.matmul(l1,weights['W2']) + biases['B2'])
 
     #use batch normalization
-    #l2 = tf.nn.dropout(l2,0.8)
+    l2 = tf.nn.dropout(l2,0.5)
     return tf.matmul(l2, weights['W3']) + biases['B3']
 
 result = neuralNet()
@@ -76,10 +75,8 @@ with tf.Session() as sess:
         seed = np.random.randint(1,TRAININGSIZE-BATCH)
         batch_x = np.array((x_training[seed:seed+BATCH]))
         batch_y = np.array(y_training_onehot[seed:seed+BATCH])
-        print(batch_x)
-        print(batch_y)
         # Run optimization op (backprop) and cost op (to get loss value)
-        c = sess.run(cost, feed_dict={x: batch_x, y_: batch_y})
+        _, c = sess.run([optimizer, cost], feed_dict={x: batch_x, y_: batch_y})
         # Compute average loss
         avg_cost += c / BATCH
         if epoch % display_step == 0:
@@ -87,18 +84,20 @@ with tf.Session() as sess:
             cLog.append(c)
     print("Training Complete")
     plt.plot(cLog)
+
+    print("Execute Test")
+    totalCorrect = 0
+    for _ in range(1000):
+        number = np.random.randint(1,5)
+        testX = getXVector(100,2,number).T
+        testX = np.reshape(testX, (1,100))
+        prediction = (sess.run(correct_prediction, feed_dict={x: testX}))
+        print("Prediction:", prediction)
+        print("Correct:", number)
+        if number == prediction:
+            totalCorrect += 1
+            print("It works")
+
+    print("Testing Accuracy:", totalCorrect/1000)
+
     plt.show()
-    # print("Execute Test")
-    # totalCorrect = 0
-    # for _ in range(1000):
-    #     number = np.random.randint(1,5)
-    #     testX = getXVector(50,2,number).T
-    #     testX = np.reshape(testX, (1,50))
-    #     prediction = (sess.run(correct_prediction, feed_dict={x: testX}))
-    #     print("Prediction:", prediction)
-    #     print("Correct:", number)
-    #     if number == prediction:
-    #         totalCorrect += 1
-    #         print("It works")
-    #
-    # print("Testing Accuracy:", totalCorrect/1000)
