@@ -1,6 +1,7 @@
 import tensorflow as tf
 import pandas as pd
 import kmeans as km
+import math
 
 #create kernel matrix
 
@@ -10,7 +11,18 @@ BATCH = TRAININGSIZE//50
 EPOCHS = 1000
 display_step = 1
 
-#create an ensemble method basically using different weights of three mechanisms depending on value of principal component
+#helper kernel functions
+def polykernel(x,y):
+    c = 2
+    d = 3
+    return math.pow(np.dot(x,y) + c, d)
+
+def rbfkernel(x,y):
+    return
+
+def kernel1(x,y):
+    return np.norm(x-y)
+
 
 #generate random y training cluster number values
 y_training = [np.random.randint(1,5) for x in range(TRAININGSIZE)]
