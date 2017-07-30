@@ -10,7 +10,7 @@ import matplotlib.pyplot as plt
 tf.InteractiveSession()
 
 #hyperparameters
-TRAININGSIZE = 500
+TRAININGSIZE = 1000
 BATCH = 20
 EPOCHS = 1000
 display_step = 1
@@ -47,8 +47,8 @@ def weights(dimensions):
 def bias(dimension):
     return tf.Variable(tf.random_normal([dimension], stddev=0.5))
 
-weights = {'W1':weights([100,50]), 'W2':weights([50,20]), 'W3': weights([20,4])}
-biases = {'B1': bias(50), 'B2': bias(20), 'B3': bias(4)}
+weights = {'W1':weights([100,50]), 'W2':weights([50,35]), 'W3': weights([35,20]), 'W4': weights([20,4])}
+biases = {'B1': bias(50), 'B2': bias(35), 'B3': bias(20),  'B4': bias(4)}
 
 def neuralNet():
     #x_d = tf.nn.dropout(x,0.8) #might need to fix these hyperparameters
@@ -59,7 +59,9 @@ def neuralNet():
 
     #use batch normalization
     l2 = tf.nn.dropout(l2,0.5)
-    return tf.matmul(l2, weights['W3']) + biases['B3']
+    l3 = tf.nn.relu(tf.matmul(l2, weights['W3']) + biases['B3'])
+
+    return tf.matmul(l3, weights['W4']) + biases['B4']
 
 result = neuralNet()
 cLog = []
