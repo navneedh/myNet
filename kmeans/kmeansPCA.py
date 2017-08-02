@@ -47,7 +47,7 @@ def weights(dimensions):
 def bias(dimension):
     return tf.Variable(tf.random_normal([dimension], stddev=0.5))
 
-weights = {'W1':weights([100,50]), 'W2':weights([50,35]), 'W3': weights([35,20]), 'W4': weights([20,4])}
+weights = {'W1':weights([100,50]),'W2':weights([50,35]), 'W3': weights([35,20]), 'W4': weights([20,4])}
 biases = {'B1': bias(50), 'B2': bias(35), 'B3': bias(20),  'B4': bias(4)}
 
 def neuralNet():

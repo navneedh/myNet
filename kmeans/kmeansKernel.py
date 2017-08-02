@@ -98,7 +98,7 @@ with tf.Session() as sess:
             print("Epoch:", '%04d' % (epoch+1), "cost=", "{:.9f}".format(c))
             cLog.append(c)
     print("Training Complete")
-    plt.plot(cLog)
+    plt.plot(cLog) 
 
     print("Execute Test")
     totalCorrect = 0
