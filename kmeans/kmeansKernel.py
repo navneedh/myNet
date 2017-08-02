@@ -8,9 +8,9 @@ import matplotlib.pyplot as plt
 #create kernel matrix
 
 #hyperparameters
-TRAININGSIZE = 500
+TRAININGSIZE = 1000
 BATCH = 20
-EPOCHS = 1000
+EPOCHS = 10000
 display_step = 1
 
 
@@ -39,17 +39,16 @@ def getXVector(points, dimension, clusters):
     x,y = km.trainingData(points,dimension,clusters)
     xy = list(zip(x,y))
     results = np.array([np.array(genkernel(np.array(xy[i]), xy)) for i in range(len(xy))])
-
-    U, S, V = np.linalg.svd(results, full_matrices=True)
+    results = np.mean(results,axis=0)
+    #U, S, V = np.linalg.svd(results, full_matrices=True)
     # return first principal component vector
-    x_training = np.concatenate([U[:,0], U[:,1]])
-    print(x_training.shape)
-    return x_training
+    #x_training = np.concatenate([U[:,0], U[:,1]])
+    return results
 
-x_training = [getXVector(25, 2, y) for y in y_training]
+x_training = [getXVector(50, 2, y) for y in y_training]
 
 y_training_onehot = [tf.one_hot([y], 4).eval()[0] for y in y_training]
-
+print(y_training_onehot)
 print("Finished gathering training data")
 
 x = tf.placeholder(tf.float32, shape=[None,50])
@@ -105,8 +104,8 @@ with tf.Session() as sess:
     totalCorrect = 0
     for _ in range(1000):
         number = np.random.randint(1,5)
-        testX = getXVector(100,2,number).T
-        testX = np.reshape(testX, (1,100))
+        testX = getXVector(50,2,number).T
+        testX = np.reshape(testX, (1,50))
         prediction = (sess.run(correct_prediction, feed_dict={x: testX}))
         print("Prediction:", prediction)
         print("Correct:", number)
