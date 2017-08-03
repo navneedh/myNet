@@ -16,7 +16,6 @@ display_step = 1
 
 tf.InteractiveSession()
 
-
 #helper kernel functions
 def polykernel(x,y):
     c = 2
@@ -29,11 +28,11 @@ def rbfkernel(x,y):
 def kernel1(x,y):
     return np.linalg.norm(x-y)
 
-def genkernel(vec, veclist, kernel = kernel1):
+def genkernel(vec, veclist, kernel = polykernel):
     return [kernel(vec,np.array(vec1)) for vec1 in veclist]
 
 #generate random y training cluster number values
-y_training = [np.random.randint(1,5) for x in range(TRAININGSIZE)]
+y_training = [np.random.randint(0,4) for x in range(TRAININGSIZE)]
 
 def getXVector(points, dimension, clusters):
     x,y = km.trainingData(points,dimension,clusters)
@@ -45,7 +44,7 @@ def getXVector(points, dimension, clusters):
     #x_training = np.concatenate([U[:,0], U[:,1]])
     return results
 
-x_training = [getXVector(50, 2, y) for y in y_training]
+x_training = [getXVector(50, 2, y+1) for y in y_training]
 
 y_training_onehot = [tf.one_hot([y], 4).eval()[0] for y in y_training]
 print(y_training_onehot)
