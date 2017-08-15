@@ -9,7 +9,7 @@ actDict = {'sigmoid': cp.sigmoid, 'relu': cp.relu, 'tanh' : cp.tanh}
 
 lossDict = {'softmax':cp.softmax, 'logistic':cp.logistic}
 
-derDict = {'derSig' : cp.derSigmoid, 'logistic' : cp.derLogLoss, 'derRelu': cp.derRelu}
+derDict = {'sigmoid' : cp.derSigmoid, 'logistic' : cp.derLogLoss, 'derRelu': cp.derRelu}
 
 class NeuralNetwork:
 
@@ -23,7 +23,7 @@ class NeuralNetwork:
         self.computation = cp.Computation(self)
         self.weightArray = []
         self.biasArray = []
-        self.derArray = []
+        self.preActArray = []
 
     def train(self,X,Y,errorFunc="logistic", learning_rate = 2.3, batchSize = 200): #probably need to create another train function for multiclass
         status = "*"
@@ -45,24 +45,23 @@ class NeuralNetwork:
         nextVal = inputData
         for i in range(len(self.layerArray) - 1): #default sigmoid activation
             nextVal = np.dot(self.layerArray[i].weights,nextVal) + self.biasArray[i]
+            self.preActArray.append(nextVal)
             vfunc = np.vectorize(actDict['sigmoid'])
             derfunc = np.vectorize(derDict['derSig'])
-            #partial derivative calculation
-            for x in range(self.layerArray[i].weights.shape[0]):
-                for y in range (self.layerArray[i].weights.shape[1]):
-                    self.layerArray[i].partialDer[x,y] = inputData[y] * derDict['derSig'](nextVal[x])
-                    self.derArray[i][x,y] = self.layerArray[i].partialDer[x,y]
-
-            self.layerArray[i+1].preActNeurons = derfunc(nextVal)
             nextVal = vfunc(nextVal)
-            inputData = nextVal
+            #inputData = nextVal
             self.layerArray[i+1].neurons = nextVal
-        return nextVal
 
-    def backwardProp(self, error, loss_function, true_error, learning_rate, finalValue):
-        totalErrorDerivative = derDict[loss_function](true_error, finalValue)
-        #print(totalErrorDerivative)
-        prog = np.array([totalErrorDerivative])
+            #partial derivative calculation
+            # for x in range(self.layerArray[i].weights.shape[0]):
+            #     for y in range (self.layerArray[i].weights.shape[1]):
+            #         self.layerArray[i].partialDer[x,y] = inputData[y] * derDict['derSig'](nextVal[x])
+            #         self.derArray[i][x,y] = self.layerArray[i].partialDer[x,y]
+
+
+
+        lastLayerGradient = derDict['logistic'](true_error, nextVal) * derDict['sigmoid'](self.preActArray[-1])
+        prog = np.array([lastLayerGradient])
         for index in reversed(range(len(self.derArray))):
             finalGradients = []
             for col in range(self.derArray[index].shape[1]):
@@ -109,10 +108,8 @@ class NeuralNetwork:
                 prevLayer.next = layer;
                 prevLayer.weights = layer.createMatrix(layer.size, prevSize, initialize)
                 prevLayer.bias = layer.createMatrix(layer.size, 1, 'zeros')
-                prevLayer.partialDer = layer.createMatrix(layer.size, prevSize, 'zeros')
                 #layer.aMatrix = prevLayer.weights
                 network.biasArray.append(prevLayer.bias)
-                network.derArray.append(prevLayer.partialDer)
                 network.weightArray.append(prevLayer.weights)
                 network.layerSizes.append(layer.size)
                 prevSize, prevLayer = layer.size, layer
