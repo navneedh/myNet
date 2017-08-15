@@ -13,6 +13,7 @@ class Layer:
         self.partialDer = None
         self.previous = None
         self.next = None
+        self.bias = None 
         self.preActNeurons = np.zeros(size)
 
     def createLayer(size, actFunc):

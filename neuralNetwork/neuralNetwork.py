@@ -22,6 +22,7 @@ class NeuralNetwork:
         self.trials = 0
         self.computation = cp.Computation(self)
         self.weightArray = []
+        self.biasArray = []
         self.derArray = []
 
     def train(self,X,Y,errorFunc="logistic", learning_rate = 2.3, batchSize = 200): #probably need to create another train function for multiclass
@@ -43,7 +44,7 @@ class NeuralNetwork:
     def forwardProp(self, inputData):
         nextVal = inputData
         for i in range(len(self.layerArray) - 1): #default sigmoid activation
-            nextVal = np.dot(self.layerArray[i].weights,nextVal)
+            nextVal = np.dot(self.layerArray[i].weights,nextVal) + self.biasArray[i]
             vfunc = np.vectorize(actDict['sigmoid'])
             derfunc = np.vectorize(derDict['derSig'])
             #partial derivative calculation
@@ -107,8 +108,10 @@ class NeuralNetwork:
                 network.layerArray.append(layer)
                 prevLayer.next = layer;
                 prevLayer.weights = layer.createMatrix(layer.size, prevSize, initialize)
+                prevLayer.bias = layer.createMatrix(layer.size, 1, 'zeros')
                 prevLayer.partialDer = layer.createMatrix(layer.size, prevSize, 'zeros')
                 #layer.aMatrix = prevLayer.weights
+                network.biasArray.append(prevLayer.bias)
                 network.derArray.append(prevLayer.partialDer)
                 network.weightArray.append(prevLayer.weights)
                 network.layerSizes.append(layer.size)
