@@ -31,53 +31,48 @@ class NeuralNetwork:
         for batchCount in range(batchSize):
             for index in range(800): #training set size
                 self.layerArray[0].neurons = X[index]
-                finalValue = self.forwardProp(X[index])[0]
-                print(finalValue)
-                errorVal = lossDict[errorFunc](finalValue, Y[index])
-                self.backwardProp(errorVal, errorFunc, Y[index], learning_rate, finalValue)
+                weightgradient, biasgradient = self.propagate(X[index])[0]
+                self.optimize(weightgradient, biasgradient)
                 self.computation.errorArray.append(errorVal)
                 print(errorVal)
             #print(str(batchCount/batchSize) * 100 + "% Complete")
         plt.plot(self.computation.errorArray)
         plt.show()
 
-    def forwardProp(self, inputData):
+    def propagate(self, inputData):
         nextVal = inputData
         for i in range(len(self.layerArray) - 1): #default sigmoid activation
             nextVal = np.dot(self.layerArray[i].weights,nextVal) + self.biasArray[i]
             self.preActArray.append(nextVal)
             vfunc = np.vectorize(actDict['sigmoid'])
-            derfunc = np.vectorize(derDict['derSig'])
             nextVal = vfunc(nextVal)
             #inputData = nextVal
             self.layerArray[i+1].neurons = nextVal
 
-            #partial derivative calculation
-            # for x in range(self.layerArray[i].weights.shape[0]):
-            #     for y in range (self.layerArray[i].weights.shape[1]):
-            #         self.layerArray[i].partialDer[x,y] = inputData[y] * derDict['derSig'](nextVal[x])
-            #         self.derArray[i][x,y] = self.layerArray[i].partialDer[x,y]
-
-
-
+        biasgradient = []
+        weightgradient = []
         lastLayerGradient = derDict['logistic'](true_error, nextVal) * derDict['sigmoid'](self.preActArray[-1])
+        biasGrad = lastLayerGradient
+        weightGrad = np.dot(lastLayerGradient, self.layerArray[-2].neurons.T)
+        biasgradient.append(biasGrad)
+        weightgradient.append(weightGrad)
         prog = np.array([lastLayerGradient])
         for index in reversed(range(len(self.derArray))):
-            finalGradients = []
-            for col in range(self.derArray[index].shape[1]):
-                finalGradients.append(np.multiply(prog, self.derArray[index][:, col]))
-            finalGradients = np.array(finalGradients).T
+            biasGrad = biasGrad * derDict['sigmoid'](self.preActArray[index - 1])
+            weightGrad = np.dot(biasGrad, self.layerArray[index - 2].T)
+            biasgradient.append(biasGrad)
+            weightgradient.append(weightGrad)
 
-            #preparing the next prog matrix for next backprop step
-            temp = []
-            for col in range(self.weightArray[index].T.shape[1]):
-                temp.append(np.multiply(self.layerArray[index].preActNeurons, self.weightArray[index].T[:,col]))
+        return weightgradient, biasgradient
 
-            prog = np.dot(prog, temp)
 
-            #gradient descent
-            self.weightArray[index] = self.weightArray[index] - np.multiply(finalGradients, learning_rate)
-            #print(self.weightArray[index])
+    def optimize(weightgradient, biasgradient, learning_rate=5): #need to fix this method
+        #gradient descent
+
+        for index in reversed(range(len(self.weightArray))):
+            self.weightArray[index] = self.weightArray[index] - np.multiply(weightgradient[index], learning_rate)
+            self.biasArray[index] = self.biasArray[index] - np.multiply(biasgradient[index], learning_rate)
+
 
     def toString(self):
         for layer in self.layerArray:
