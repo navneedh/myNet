@@ -61,9 +61,9 @@ class NeuralNetwork:
         weightgradient.append(weightGrad)
         prog = np.array([lastLayerGradient])
         for index in reversed(range(len(self.weightArray))):
-            biasGrad = biasGrad * derDict['sigmoid'](self.preActArray[index - 1])
+            biasGrad = np.dot(self.weightArray[index - 1], biasGrad) * derDict['sigmoid'](self.preActArray[index])
             l = self.layerArray[index - 2].neurons
-            weightGrad = np.dot(biasGrad, self.layerArray[index - 2].neurons.reshape(l.shape[1],l.shape[0]))
+            weightGrad = np.dot(biasGrad, l.reshape(1,l.shape[0]))
             biasgradient.append(biasGrad)
             weightgradient.append(weightGrad)
 
