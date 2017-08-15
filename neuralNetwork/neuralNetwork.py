@@ -29,9 +29,10 @@ class NeuralNetwork:
         status = "*"
         errorVal = 0 #new change
         for batchCount in range(batchSize):
-            for index in range(800): #training set size
+            for index in range(4): #training set size
+                print(Y[index])
                 self.layerArray[0].neurons = X[index]
-                weightgradient, biasgradient = self.propagate(X[index])[0]
+                weightgradient, biasgradient = self.propagate(X[index],Y[index])
                 self.optimize(weightgradient, biasgradient)
                 self.computation.errorArray.append(errorVal)
                 print(errorVal)
@@ -39,8 +40,8 @@ class NeuralNetwork:
         plt.plot(self.computation.errorArray)
         plt.show()
 
-    def propagate(self, inputData):
-        nextVal = inputData
+    def propagate(self, x, y):
+        nextVal = x
         for i in range(len(self.layerArray) - 1): #default sigmoid activation
             nextVal = np.dot(self.layerArray[i].weights,nextVal) + self.biasArray[i]
             self.preActArray.append(nextVal)
@@ -51,15 +52,15 @@ class NeuralNetwork:
 
         biasgradient = []
         weightgradient = []
-        lastLayerGradient = derDict['logistic'](true_error, nextVal) * derDict['sigmoid'](self.preActArray[-1])
+        lastLayerGradient = derDict['logistic'](y, nextVal) * derDict['sigmoid'](self.preActArray[-1])
         biasGrad = lastLayerGradient
         weightGrad = np.dot(lastLayerGradient, self.layerArray[-2].neurons.T)
         biasgradient.append(biasGrad)
         weightgradient.append(weightGrad)
         prog = np.array([lastLayerGradient])
-        for index in reversed(range(len(self.derArray))):
+        for index in reversed(range(len(self.weightArray))):
             biasGrad = biasGrad * derDict['sigmoid'](self.preActArray[index - 1])
-            weightGrad = np.dot(biasGrad, self.layerArray[index - 2].T)
+            weightGrad = np.dot(biasGrad, self.layerArray[index - 2].neurons.T)
             biasgradient.append(biasGrad)
             weightgradient.append(weightGrad)
 

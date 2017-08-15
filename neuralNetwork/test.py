@@ -5,8 +5,13 @@ import neuralNetwork as net
 #from clean import df
 
 
-df = pd.read_csv('../trainingData/xor.csv', header=0).as_matrix()
+df = pd.read_csv('../trainingData/xor.csv').as_matrix()
 
+X = np.array([[0,0],[0,1],[1,0],[1,1]])
+Y = np.array([0,1,1,0])
+
+print(X)
+print(Y)
 
 #vector one
 #vector two
