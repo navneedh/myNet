@@ -54,13 +54,16 @@ class NeuralNetwork:
         weightgradient = []
         lastLayerGradient = derDict['logistic'](y, nextVal) * derDict['sigmoid'](self.preActArray[-1])
         biasGrad = lastLayerGradient
-        weightGrad = np.dot(lastLayerGradient, self.layerArray[-2].neurons.T)
+        print(self.layerArray[-2].neurons.shape[0])
+        print(self.layerArray[-2].neurons.reshape(1,3))
+        weightGrad = np.dot(lastLayerGradient, self.layerArray[-2].neurons.reshape(1,self.layerArray[-2].neurons.shape[0])) #need to change from constant 1 for multiclass
         biasgradient.append(biasGrad)
         weightgradient.append(weightGrad)
         prog = np.array([lastLayerGradient])
         for index in reversed(range(len(self.weightArray))):
             biasGrad = biasGrad * derDict['sigmoid'](self.preActArray[index - 1])
-            weightGrad = np.dot(biasGrad, self.layerArray[index - 2].neurons.T)
+            l = self.layerArray[index - 2].neurons
+            weightGrad = np.dot(biasGrad, self.layerArray[index - 2].neurons.reshape(l.shape[1],l.shape[0]))
             biasgradient.append(biasGrad)
             weightgradient.append(weightGrad)
 
@@ -103,7 +106,7 @@ class NeuralNetwork:
                 network.layerArray.append(layer)
                 prevLayer.next = layer;
                 prevLayer.weights = layer.createMatrix(layer.size, prevSize, initialize)
-                prevLayer.bias = layer.createMatrix(layer.size, 1, 'zeros')
+                prevLayer.bias = np.zeros(layer.size) #should not be initialized at zero
                 #layer.aMatrix = prevLayer.weights
                 network.biasArray.append(prevLayer.bias)
                 network.weightArray.append(prevLayer.weights)
