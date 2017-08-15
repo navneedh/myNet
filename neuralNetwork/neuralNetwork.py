@@ -69,14 +69,12 @@ class NeuralNetwork:
 
         return weightgradient, biasgradient
 
-
     def optimize(weightgradient, biasgradient, learning_rate=5): #need to fix this method
         #gradient descent
 
         for index in reversed(range(len(self.weightArray))):
             self.weightArray[index] = self.weightArray[index] - np.multiply(weightgradient[index], learning_rate)
             self.biasArray[index] = self.biasArray[index] - np.multiply(biasgradient[index], learning_rate)
-
 
     def toString(self):
         for layer in self.layerArray:
