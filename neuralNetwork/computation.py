@@ -1,4 +1,5 @@
 import math
+import numpy as np
 
 class Computation:
 
@@ -10,7 +11,7 @@ class Computation:
 
 #activation functions
 def sigmoid(x):
-    return 1/ (1 + math.exp(-x))
+    return 1.0/ (1.0 + np.exp(-x))
 
 def tanh(x):
     return np.tanh([x]) #might only be possible with array
@@ -53,8 +54,8 @@ def l2(actual, expected):
 #derivatives
 
 def derSigmoid(x):
-    return math.exp(-x)/(math.pow((1 + math.exp(-x)),2))
-    #return x * (1-x)
+    return sigmoid(x)*(1-sigmoid(x))
+
 
 def derLogLoss(true_error, x):
     if true_error == 1:

@@ -94,7 +94,7 @@ class NeuralNetwork:
 
         if classify == "binary":
             lastLayer = ly.Layer(1, 'sigmoid', True)
-        elif classify == "multiclass":
+        elif classify == "multiclass": #still in development
             lastLayer = ly.Layer(10000, 'softmax', True) #100 is a filler number
 
         prevSize, prevLayer = inputLayer.size, inputLayer

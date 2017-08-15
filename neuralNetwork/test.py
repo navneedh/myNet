@@ -8,9 +8,6 @@ import neuralNetwork as net
 df = pd.read_csv('../trainingData/xor.csv', header=0).as_matrix()
 
 
-
-
-#need to create an input output framework
 #vector one
 #vector two
 hLayer1 = net.ly.Layer(2, 'sigmoid')
