@@ -2,12 +2,11 @@ import numpy as np
 import pandas as pd
 import csv
 import neuralNetwork as net
-from clean import df
+#from clean import df
 
-data=df.as_matrix()
-#data = pd.read_csv('../trainingData/testData1.csv', header=0).as_matrix()
-X = (data[:,0:data.shape[1]-1])
-Y = data[:,data.shape[1] - 1]
+
+df = pd.read_csv('../trainingData/xor.csv', header=0).as_matrix()
+
 
 
 
