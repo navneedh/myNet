@@ -68,8 +68,6 @@ class NeuralNetwork:
                 finalGradients.append(np.multiply(prog, self.derArray[index][:, col]))
             finalGradients = np.array(finalGradients).T
 
-            # print("finalG", finalGradients)
-
             #preparing the next prog matrix for next backprop step
             temp = []
             for col in range(self.weightArray[index].T.shape[1]):

@@ -59,7 +59,7 @@ def derSigmoid(x):
 
 def derLogLoss(true_error, x):
     if true_error == 1:
-        return -1/x #this does natural log
+        return -1/x #this uses natural log
     elif true_error == 0:
         return 1/(1-x)
 
