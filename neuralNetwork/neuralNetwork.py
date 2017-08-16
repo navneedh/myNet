@@ -30,12 +30,11 @@ class NeuralNetwork:
         errorVal = 0 #new change
         for batchCount in range(batchSize):
             for index in range(4): #training set size
-                print(Y[index])
                 self.layerArray[0].neurons = X[index]
                 weightgradient, biasgradient = self.propagate(X[index],Y[index])
                 self.optimize(weightgradient, biasgradient)
                 self.computation.errorArray.append(errorVal)
-                print(errorVal)
+                print("Error:", errorVal)
             #print(str(batchCount/batchSize) * 100 + "% Complete")
         plt.plot(self.computation.errorArray)
         plt.show()
@@ -54,26 +53,27 @@ class NeuralNetwork:
         weightgradient = []
         lastLayerGradient = derDict['logistic'](y, nextVal) * derDict['sigmoid'](self.preActArray[-1])
         biasGrad = lastLayerGradient
-        print(self.layerArray[-2].neurons.shape[0])
-        print(self.layerArray[-2].neurons.reshape(1,3))
         weightGrad = np.dot(lastLayerGradient, self.layerArray[-2].neurons.reshape(1,self.layerArray[-2].neurons.shape[0])) #need to change from constant 1 for multiclass
         biasgradient.append(biasGrad)
         weightgradient.append(weightGrad)
         prog = np.array([lastLayerGradient])
         for index in reversed(range(len(self.weightArray))):
-            biasGrad = np.dot(self.weightArray[index - 1], biasGrad) * derDict['sigmoid'](self.preActArray[index])
-            l = self.layerArray[index - 2].neurons
-            weightGrad = np.dot(biasGrad, l.reshape(1,l.shape[0]))
+            x = np.dot(self.weightArray[index].T, biasGrad)
+            biasGrad = np.dot(self.weightArray[index].T, biasGrad) * derDict['sigmoid'](self.preActArray[index - 1])
+            l = self.layerArray[index - 1].neurons
+            weightGrad = np.outer(biasGrad, l)
             biasgradient.append(biasGrad)
             weightgradient.append(weightGrad)
 
-        return weightgradient, biasgradient
 
-    def optimize(weightgradient, biasgradient, learning_rate=5): #need to fix this method
+        return list(reversed(weightgradient[:-1])), list(reversed(biasgradient[:-1]))
+
+    def optimize(self, weightgradient, biasgradient, learning_rate=5): #need to fix this method
         #gradient descent
 
-        for index in reversed(range(len(self.weightArray))):
-            self.weightArray[index] = self.weightArray[index] - np.multiply(weightgradient[index], learning_rate)
+
+        for index in (range(len(self.weightArray))):
+            self.weightArray[index] = self.weightArray[index - len(self.weightArray)] - np.multiply(weightgradient[index], learning_rate)
             self.biasArray[index] = self.biasArray[index] - np.multiply(biasgradient[index], learning_rate)
 
     def toString(self):
