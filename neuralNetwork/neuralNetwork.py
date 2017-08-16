@@ -48,18 +48,12 @@ class NeuralNetwork:
         for i in range(len(self.layerArray) - 1): #default sigmoid activation
             nextVal = np.dot(self.layerArray[i].weights,nextVal) + self.biasArray[i]
             self.preActArray.append(nextVal)
-            vfunc = np.vectorize(actDict['relu'])
-            vfunc2 = np.vectorize(actDict['sigmoid'])
-            if i != 3:
-                nextVal = vfunc(nextVal)
-            else:
-                nextVal = vfunc2(nextVal)
-            #inputData = nextVal
+            vfunc = np.vectorize(actDict['sigmoid'])
+            nextVal = vfunc(nextVal)
             self.layerArray[i+1].neurons = nextVal
 
         result = nextVal
-        biasgradient = []
-        weightgradient = []
+        biasgradient, weightgradient = [], []
         lastLayerGradient = derDict['logistic'](y, nextVal) * derDict['sigmoid'](self.preActArray[-1])
         biasGrad = lastLayerGradient
         weightGrad = np.dot(lastLayerGradient, self.layerArray[-2].neurons.reshape(1,self.layerArray[-2].neurons.shape[0])) #need to change from constant 1 for multiclass
@@ -68,7 +62,7 @@ class NeuralNetwork:
         prog = np.array([lastLayerGradient])
         for index in reversed(range(len(self.weightArray))):
             x = np.dot(self.weightArray[index].T, biasGrad)
-            biasGrad = np.dot(self.weightArray[index].T, biasGrad) * derDict['relu'](self.preActArray[index - 1])
+            biasGrad = np.dot(self.weightArray[index].T, biasGrad) * derDict['sigmoid'](self.preActArray[index - 1])
             l = self.layerArray[index - 1].neurons
             weightGrad = np.outer(biasGrad, l)
             biasgradient.append(biasGrad)
@@ -78,8 +72,6 @@ class NeuralNetwork:
 
     def optimize(self, weightgradient, biasgradient, learning_rate=0.3): #need to fix this method
         #gradient descent
-
-
         for index in (range(len(self.weightArray))):
             self.weightArray[index] = self.weightArray[index] - np.multiply(weightgradient[index], learning_rate)
             self.biasArray[index] = self.biasArray[index] - np.multiply(biasgradient[index], learning_rate)
