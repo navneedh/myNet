@@ -9,7 +9,7 @@ actDict = {'sigmoid': cp.sigmoid, 'relu': cp.relu, 'tanh' : cp.tanh}
 
 lossDict = {'softmax':cp.softmax, 'logistic':cp.logistic}
 
-derDict = {'sigmoid' : cp.derSigmoid, 'logistic' : cp.derLogLoss, 'derRelu': cp.derRelu}
+derDict = {'sigmoid' : cp.derSigmoid, 'logistic' : cp.derLogLoss, 'relu': cp.derRelu}
 
 class NeuralNetwork:
 
@@ -25,20 +25,22 @@ class NeuralNetwork:
         self.biasArray = []
         self.preActArray = []
 
-    def train(self,X,Y,errorFunc="logistic", learning_rate = 2.3, batchSize = 200): #probably need to create another train function for multiclass
+    def train(self,X,Y,errorFunc="logistic", learning_rate = 0.3, batchSize = 4000): #probably need to create another train function for multiclass
         status = "*"
         error = 0 #new change
         for batchCount in range(batchSize):
             for index in range(4): #training set size
                 self.layerArray[0].neurons = X[index]
                 weightgradient, biasgradient, result = self.propagate(X[index],Y[index])
-                print(result)
+                print(result, Y[index])
                 self.optimize(weightgradient, biasgradient)
                 error = lossDict['logistic'](result[0], Y[index])
                 self.computation.errorArray.append(error)
                 print("Error:", error)
             #print(str(batchCount/batchSize) * 100 + "% Complete")
         plt.plot(self.computation.errorArray)
+        print(self.weightArray)
+        print(self.biasArray)
         plt.show()
 
     def propagate(self, x, y):
@@ -46,8 +48,12 @@ class NeuralNetwork:
         for i in range(len(self.layerArray) - 1): #default sigmoid activation
             nextVal = np.dot(self.layerArray[i].weights,nextVal) + self.biasArray[i]
             self.preActArray.append(nextVal)
-            vfunc = np.vectorize(actDict['sigmoid'])
-            nextVal = vfunc(nextVal)
+            vfunc = np.vectorize(actDict['relu'])
+            vfunc2 = np.vectorize(actDict['sigmoid'])
+            if i != 3:
+                nextVal = vfunc(nextVal)
+            else:
+                nextVal = vfunc2(nextVal)
             #inputData = nextVal
             self.layerArray[i+1].neurons = nextVal
 
@@ -62,7 +68,7 @@ class NeuralNetwork:
         prog = np.array([lastLayerGradient])
         for index in reversed(range(len(self.weightArray))):
             x = np.dot(self.weightArray[index].T, biasGrad)
-            biasGrad = np.dot(self.weightArray[index].T, biasGrad) * derDict['sigmoid'](self.preActArray[index - 1])
+            biasGrad = np.dot(self.weightArray[index].T, biasGrad) * derDict['relu'](self.preActArray[index - 1])
             l = self.layerArray[index - 1].neurons
             weightGrad = np.outer(biasGrad, l)
             biasgradient.append(biasGrad)
@@ -70,12 +76,12 @@ class NeuralNetwork:
 
         return list(reversed(weightgradient[:-1])), list(reversed(biasgradient[:-1])), result
 
-    def optimize(self, weightgradient, biasgradient, learning_rate=5): #need to fix this method
+    def optimize(self, weightgradient, biasgradient, learning_rate=0.3): #need to fix this method
         #gradient descent
 
 
         for index in (range(len(self.weightArray))):
-            self.weightArray[index] = self.weightArray[index - len(self.weightArray)] - np.multiply(weightgradient[index], learning_rate)
+            self.weightArray[index] = self.weightArray[index] - np.multiply(weightgradient[index], learning_rate)
             self.biasArray[index] = self.biasArray[index] - np.multiply(biasgradient[index], learning_rate)
 
     def toString(self):
@@ -106,7 +112,7 @@ class NeuralNetwork:
                 network.layerArray.append(layer)
                 prevLayer.next = layer;
                 prevLayer.weights = layer.createMatrix(layer.size, prevSize, initialize)
-                prevLayer.bias = np.zeros(layer.size) #should not be initialized at zero
+                prevLayer.bias = np.random.rand(layer.size) #should not be initialized at zero
                 #layer.aMatrix = prevLayer.weights
                 network.biasArray.append(prevLayer.bias)
                 network.weightArray.append(prevLayer.weights)

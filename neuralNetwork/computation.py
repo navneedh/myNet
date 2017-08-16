@@ -64,7 +64,7 @@ def derLogLoss(true_error, x):
         return 1/(1-x)
 
 def derRelu(x):
-    if x <= 0:
-        return 0
-    else:
-        return 1
+    a = np.array(x)
+    a[a<=0] = 0
+    a[a>0] = 1
+    return a

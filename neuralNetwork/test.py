@@ -10,11 +10,6 @@ df = pd.read_csv('../trainingData/xor.csv').as_matrix()
 X = np.array([[0,0],[0,1],[1,0],[1,1]])
 Y = np.array([0,1,1,0])
 
-print(X)
-print(Y)
-
-#vector one
-#vector two
 hLayer1 = net.ly.Layer(2, 'sigmoid')
 hLayer3 = net.ly.Layer(4, 'sigmoid')
 #vector three
