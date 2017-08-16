@@ -27,14 +27,16 @@ class NeuralNetwork:
 
     def train(self,X,Y,errorFunc="logistic", learning_rate = 2.3, batchSize = 200): #probably need to create another train function for multiclass
         status = "*"
-        errorVal = 0 #new change
+        error = 0 #new change
         for batchCount in range(batchSize):
             for index in range(4): #training set size
                 self.layerArray[0].neurons = X[index]
-                weightgradient, biasgradient = self.propagate(X[index],Y[index])
+                weightgradient, biasgradient, result = self.propagate(X[index],Y[index])
+                print(result)
                 self.optimize(weightgradient, biasgradient)
-                self.computation.errorArray.append(errorVal)
-                print("Error:", errorVal)
+                error = lossDict['logistic'](result[0], Y[index])
+                self.computation.errorArray.append(error)
+                print("Error:", error)
             #print(str(batchCount/batchSize) * 100 + "% Complete")
         plt.plot(self.computation.errorArray)
         plt.show()
@@ -49,6 +51,7 @@ class NeuralNetwork:
             #inputData = nextVal
             self.layerArray[i+1].neurons = nextVal
 
+        result = nextVal
         biasgradient = []
         weightgradient = []
         lastLayerGradient = derDict['logistic'](y, nextVal) * derDict['sigmoid'](self.preActArray[-1])
@@ -65,8 +68,7 @@ class NeuralNetwork:
             biasgradient.append(biasGrad)
             weightgradient.append(weightGrad)
 
-
-        return list(reversed(weightgradient[:-1])), list(reversed(biasgradient[:-1]))
+        return list(reversed(weightgradient[:-1])), list(reversed(biasgradient[:-1])), result
 
     def optimize(self, weightgradient, biasgradient, learning_rate=5): #need to fix this method
         #gradient descent
