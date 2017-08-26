@@ -13,13 +13,12 @@ BATCH = 25
 EPOCHS = 1000
 display_step = 1
 
-
 tf.InteractiveSession()
 
 #helper kernel functions
 def polykernel(x,y):
     c = 2
-    d = 3
+    d = 3 
     return math.pow(np.dot(x,y) + c, d)
 
 def rbfkernel(x,y):
